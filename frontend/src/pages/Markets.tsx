@@ -22,8 +22,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -35,8 +35,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -48,8 +48,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -61,8 +61,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -74,8 +74,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -87,8 +87,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -100,8 +100,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
@@ -113,8 +113,8 @@ const Markets: React.FC = () => {
             <td className="text-nowrap">#1</td>
             <td>BTC</td>
             <td>95'377.13</td>
-            <td><span className="text-sm">14151561000</span></td>
-            <td className="text-sm">March 1, 2024</td>
+            <td><span className="text-base">14151561000</span></td>
+            <td className="text-base">1'890'727'524'027.01</td>
             <td className="text-center  gap-2">
               <button className="btn btn-circle btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--star] size-5"></span></button>
               <button className="btn btn-circle btn-success btn-text btn-sm" aria-label="Action button"><span className="icon-[tabler--square-arrow-down] size-5"></span></button>
