@@ -4,7 +4,7 @@ const Markets: React.FC = () => {
     <div className="text-xl font-medium mb-2">
       Markets
     </div>
-    <div className="border-base-content/25 w-full rounded-lg border">
+    <div className="border-base-content/25 w-full rounded-lg border bg-white">
     <div className="overflow-x-auto">
       <table className="table rounded">
         <thead>
