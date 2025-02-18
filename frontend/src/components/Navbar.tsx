@@ -101,7 +101,7 @@ const Navbar = () => {
       </div>
     </div>
     <div className="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-      <button id="dropdown-scrollable" type="button" className="dropdown-toggle flex items-center" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+      <button id="dropdown-scrollable" type="button" className="dropdown-toggle flex items-center focus:outline-gray-800 focus:outline-rounded" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
         <div className="avatar">
           <div className="size-9.5 rounded-full">
             <img src="https://avatars.githubusercontent.com/u/112156217?v=4&size=64" alt="avatar 1" />
