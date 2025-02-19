@@ -15,7 +15,7 @@ const Markets: React.FC = () => {
 
   useEffect(() => {
     // This will be replaced with your actual API call
-    fetch('/data.json')
+    fetch('/coindata.json')
       .then(response => response.json())
       .then(data => setCryptoData(data))
       .catch(error => console.error('Error fetching data:', error));
