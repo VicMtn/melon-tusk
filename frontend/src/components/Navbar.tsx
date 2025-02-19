@@ -156,7 +156,7 @@ const Navbar = () => {
       <li>
         <a href="/">
           <span className="icon-[tabler--home] size-6"></span>
-          Home
+          Dashboard
         </a>
       </li>
       <li>
