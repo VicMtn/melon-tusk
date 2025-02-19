@@ -39,6 +39,7 @@ const Markets: React.FC = () => {
         <div className="text-xl font-medium">
           Markets
         </div>
+        <div className="divider m-0 h-1"></div>
         <div className="w-full max-w-md">
           <div className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
