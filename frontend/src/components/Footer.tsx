@@ -1,11 +1,10 @@
-
 const Footer = () => {
   return (
-    <footer className="footer bottom-0 w-full footer-center  z-50 bg-base-100 py-2">
+    <footer className="footer mt-auto w-full footer-center bg-base-100 py-2">
       <aside>
         <p>MelonTusk © 2025 - All right reserved.</p>
       </aside>
-</footer>
+    </footer>
   );
 }
 
