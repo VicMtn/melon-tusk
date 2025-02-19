@@ -4,7 +4,7 @@ import logo from '../assets/images/logo.png';
 const Navbar = () => {
   return (
     <>
-<nav className="navbar bg-base-100 max-sm:rounded-box max-sm:shadow sm:border-b border-base-content/25 sm:z-[50] fixed top-0 left-0 right-0 shadow-sm">
+<nav className="navbar bg-base-100 max-sm:rounded-box max-sm:shadow sm:border-b border-base-content/25 fixed top-0 left-0 right-0 z-[999] shadow-sm">
   <button type="button" className="btn btn-text max-sm:btn-square sm:hidden me-2" aria-haspopup="dialog" aria-expanded="false" aria-controls="default-sidebar" data-overlay="#default-sidebar" >
     <span className="icon-[tabler--menu-2] size-5"></span>
   </button>
@@ -149,7 +149,7 @@ const Navbar = () => {
   </div>
 </nav>
 
-<aside id="default-sidebar" className="overlay sm:shadow-none overlay-open:translate-x-0 drawer drawer-start hidden max-w-64 sm:flex sm:translate-x-0 bottom-16 pt-16 z-40" role="dialog" >
+<aside id="default-sidebar" className="overlay sm:shadow-none overlay-open:translate-x-0 drawer drawer-start hidden max-w-64 sm:flex sm:translate-x-0 bottom-16 pt-16 z-[998]" role="dialog" >
   <div className="drawer-body px-2 pt-4">
     
     <ul className="menu p-0">
