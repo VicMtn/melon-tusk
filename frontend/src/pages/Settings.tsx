@@ -23,7 +23,7 @@ const Settings = () => {
       </div>
       <div className="divider m-0 h-1"></div>
 
-      <div className="card bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow">
         <div className="card-body">
           <h2 className="card-title mb-4">Theme Settings</h2>
           
