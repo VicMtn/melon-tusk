@@ -11,6 +11,7 @@ import Markets from "./pages/Markets";
 import Watchlist from "./pages/Watchlist";
 import Assets from "./pages/Assets";
 import Transactions from "./pages/Transactions";
+import Profile from "./pages/Profile";
 import Faq from "./pages/Faq";
 import NotFound from "./pages/errors/NotFound";
 
@@ -41,6 +42,7 @@ const App: React.FC = () => {
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/assets" element={<Assets />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/faq" element={<Faq />} />
         </Route>
         <Route path="*" element={<NotFound />} />
