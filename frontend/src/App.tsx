@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import {
   useLocation,
   Routes,
-  Route
+  Route,
 } from "react-router-dom";
 import { IStaticMethods } from "flyonui/flyonui";
 import MainLayout from "./core/MainLayout";
@@ -14,6 +14,8 @@ import Transactions from "./pages/Transactions";
 import Profile from "./pages/Profile";
 import Faq from "./pages/Faq";
 import NotFound from "./pages/errors/NotFound";
+import Settings from "./pages/Settings";
+import { ThemeProvider } from "./core/ThemeContext";
 
 declare global {
   interface Window {
@@ -35,18 +37,21 @@ const App: React.FC = () => {
   }, [location.pathname]);
 
   return (
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/markets" element={<Markets />} />
-          <Route path="/watchlist" element={<Watchlist />} />
-          <Route path="/assets" element={<Assets />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/faq" element={<Faq />} />
-        </Route>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+    <ThemeProvider>
+          <Routes>
+            <Route element={<MainLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="/markets" element={<Markets />} />
+              <Route path="/watchlist" element={<Watchlist />} />
+              <Route path="/assets" element={<Assets />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+    </ThemeProvider>
   );
 };
 
