@@ -178,12 +178,6 @@ const Navbar = () => {
         </a>
       </li>
       <li>
-        <a href="/profit-losses">
-          <span className="icon-[tabler--graph] size-6"></span>
-          Profits & Losses
-        </a>
-      </li>
-      <li>
         <a href="/transactions">
           <span className="icon-[tabler--arrows-exchange] size-6"></span>
           Transactions

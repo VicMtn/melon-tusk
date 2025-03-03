@@ -10,9 +10,8 @@ import HomePage from "./pages/HomePage";
 import Markets from "./pages/Markets";
 import Watchlist from "./pages/Watchlist";
 import Assets from "./pages/Assets";
-import ProfitLosses from "./pages/ProfitLosses";
 import Transactions from "./pages/Transactions";
-import NotFound from "./pages/errors/notfound";
+import NotFound from "./pages/errors/NotFound";
 
 declare global {
   interface Window {
@@ -40,9 +39,7 @@ const App: React.FC = () => {
           <Route path="/markets" element={<Markets />} />
           <Route path="/watchlist" element={<Watchlist />} />
           <Route path="/assets" element={<Assets />} />
-          <Route path="/profit-losses" element={<ProfitLosses />} />
           <Route path="/transactions" element={<Transactions />} />
-
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
