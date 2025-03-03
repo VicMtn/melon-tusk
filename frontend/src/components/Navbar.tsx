@@ -121,7 +121,7 @@ const Navbar = () => {
           </div>
         </li>
         <li>
-          <a className="dropdown-item" href="#">
+          <a className="dropdown-item" href="/profile">
             <span className="icon-[tabler--user] size-5"></span>
             My Profile
           </a>
@@ -133,7 +133,7 @@ const Navbar = () => {
           </a>
         </li>
         <li>
-          <a className="dropdown-item" href="#">
+          <a className="dropdown-item" href="/faq">
             <span className="icon-[tabler--question-mark] size-5"></span>
             FAQs
           </a>
