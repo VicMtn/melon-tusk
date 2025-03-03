@@ -1,4 +1,6 @@
 import { CoinCardContainer } from '../components/CoinCard';
+import { ArticleCard } from '../components/ArticleCard';
+import articleData from '../../late_article_data.json';
 
 const HomePage: React.FC = () => {
   return (
@@ -26,52 +28,10 @@ const HomePage: React.FC = () => {
         <div className="divider m-0 h-1"></div>
         <div className="text-m font-medium">Top News</div>
         <div className="flex gap-4">
-          <div className="card sm:card-side flex-1 bg-white">
-            <figure className="sm:w-48 sm:min-w-48">
-              <img
-                src="https://cdn.flyonui.com/fy-assets/components/card/image-7.png"
-                alt="headphone"
-                className="w-full h-full object-cover"
-              />
-            </figure>
-            <div className="card-body">
-              <h5 className="card-title mb-2.5">Airpods Max</h5>
-              <p className="mb-3">
-                This is a wider card with supporting text below as a natural
-                lead-in to additional content.
-              </p>
-              <div className="card-actions">
-                <button className="btn btn-primary">Buy Now</button>
-                <button className="btn btn-secondary btn-soft">
-                  Add to cart
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="card sm:card-side flex-1 bg-white">
-            <figure className="sm:w-48 sm:min-w-48">
-              <img
-                src="https://cdn.flyonui.com/fy-assets/components/card/image-7.png"
-                alt="headphone"
-                className="w-full h-full object-cover"
-              />
-            </figure>
-            <div className="card-body">
-              <h5 className="card-title mb-2.5">Airpods Max</h5>
-              <p className="mb-3">
-                This is a wider card with supporting text below as a natural
-                lead-in to additional content.
-              </p>
-              <div className="card-actions">
-                <button className="btn btn-primary">Buy Now</button>
-                <button className="btn btn-secondary btn-soft">
-                  Add to cart
-                </button>
-              </div>
-            </div>
-          </div>
+          <ArticleCard article={articleData.Data[0]} />
+          <ArticleCard article={articleData.Data[1]} />
         </div>
-      </div>
+        </div>
     </>
   );
 };
