@@ -127,7 +127,7 @@ const Navbar = () => {
           </a>
         </li>
         <li>
-          <a className="dropdown-item" href="#">
+          <a className="dropdown-item" href="/settings">
             <span className="icon-[tabler--settings] size-5"></span>
             Settings
           </a>
