@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { startFetching } from './services/liveCoinWatchService';
 import { AuthService } from './services/AuthService';
 import { CoinDeskService } from './services/CoinDeskService';
-
+import { authMiddleware } from './middleware/authMiddleware';
 
 
 const app = express();
@@ -24,10 +24,10 @@ startFetching(); // Start fetching coin data every defined interval
 
 let coinDeskService = new CoinDeskService();
 
-app.get('/news', async (req, res) => {
+app.get('/news', authMiddleware, async (req, res) => {
   try {
     const newsArticles = await coinDeskService.fetchNewsArticles();
-    res.json(newsArticles); // Send the news articles as a JSON response
+    res.json(newsArticles);
   } catch (error) {
     console.error('Error fetching news articles:', error);
     res.status(500).json({ error: 'Failed to fetch news articles' });
