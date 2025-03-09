@@ -5,7 +5,8 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { startFetching } from './services/liveCoinWatchService';
 import { AuthService } from './services/AuthService.js';
-
+import { authMiddleware } from './middleware/authMiddleware';
+import Asset from './models/Asset';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,7 +21,7 @@ mongoose
 
   startFetching();
 
-const authService = new AuthService(process.env.JWT_SECRET!);
+const authService = new AuthService(process.env.JWT_SECRET!, process.env.LCW_CODES!.split(','));
 
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
@@ -41,6 +42,44 @@ app.post('/login', async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(401).json({ error: (error as Error).message });
+  }
+});
+
+app.put('/assets', authMiddleware, async (req, res) => {
+  const userId = (req as any).user.userId;
+  const assets: { coinId: string; amount: number }[] = req.body;
+
+  try {
+    const validCoins = process.env.LCW_CODES!.split(',');
+    for (const asset of assets) {
+      if (!validCoins.includes(asset.coinId)) {
+        return res.status(400).json({ error: `Invalid coinId: ${asset.coinId}` });
+      }
+    }
+
+    for (const asset of assets) {
+      await Asset.findOneAndUpdate(
+        { userId, coinId: asset.coinId },
+        { amount: asset.amount },
+        { upsert: true, new: true }
+      );
+    }
+
+    res.json({ message: 'Portfolio updated successfully' });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+app.get('/assets', authMiddleware, async (req, res) => {
+  const userId = (req as any).user.userId;
+
+  try {
+    let assets = await Asset.find({ userId });
+
+    res.json(assets);
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
   }
 });
 
