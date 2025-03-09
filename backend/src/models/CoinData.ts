@@ -32,4 +32,4 @@ const coinDataSchema: Schema = new Schema({
   timestamp: { type: Date, default: Date.now },
 });
 
-export default mongoose.model<ICoinData>('CoinData', coinDataSchema);
+export default mongoose.model<ICoinData>('Coin', coinDataSchema, 'Coins');
