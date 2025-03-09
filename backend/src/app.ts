@@ -3,8 +3,9 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { startFetching } from './services/liveCoinWatchService.js';
-import { CoinDeskService } from './services/CoinDeskService.js';
+import { startFetching } from './services/liveCoinWatchService';
+import { AuthService } from './services/AuthService';
+import { CoinDeskService } from './services/CoinDeskService';
 
 
 
@@ -30,6 +31,30 @@ app.get('/news', async (req, res) => {
   } catch (error) {
     console.error('Error fetching news articles:', error);
     res.status(500).json({ error: 'Failed to fetch news articles' });
+  }
+});
+
+const authService = new AuthService(process.env.JWT_SECRET!);
+
+app.post('/register', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await authService.register(email, password);
+    res.status(201).json({ message: 'User registered successfully', user });
+  } catch (error) {
+    res.status(400).json({ error: (error as Error).message });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const token = await authService.login(email, password);
+    res.json({ token });
+  } catch (error) {
+    res.status(401).json({ error: (error as Error).message });
   }
 });
 
