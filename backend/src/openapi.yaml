@@ -1,0 +1,326 @@
+openapi: 3.0.0
+info:
+  title: Melon Tusk API
+  description: API for managing user portfolios and fetching coin data.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      description: Register a new user with an email and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+                - email
+                - password
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request (e.g., user already exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User already exists
+
+  /login:
+    post:
+      summary: Log in a user
+      description: Log in a user with an email and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized (e.g., invalid email or password)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid email or password
+
+  /assets:
+    put:
+      summary: Update the user's portfolio
+      description: Update the user's portfolio with a list of assets.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AssetInput'
+      responses:
+        '200':
+          description: Portfolio updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Portfolio updated successfully
+        '400':
+          description: Bad request (e.g., invalid coinId)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid coinId: XYZ
+
+    get:
+      summary: Retrieve the user's portfolio
+      description: Retrieve all assets in the user's portfolio.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Portfolio retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+        '400':
+          description: Bad request (e.g., invalid token)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid token
+
+  /coins:
+    get:
+      summary: Fetch coin data
+      description: Fetch coin data from a specific datetime to the present.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: datetime
+          in: query
+          description: The starting datetime in ISO format (e.g., "2025-02-23T00:30:40.464Z")
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Coin data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoinDataResponse'
+        '400':
+          description: Bad request (e.g., invalid datetime format)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid datetime format. Use ISO format (e.g., "2025-02-23T00:30:40.464Z").
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to fetch coin data
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 65a1b2c3d4e5f6a7b8c9d0e1
+        email:
+          type: string
+          format: email
+          example: test@example.com
+        password:
+          type: string
+          example: $2b$10$z8ImrIzH.VXyKwRWtixWXO3Yj7A69IlLPi/rSGmYHXy6k0vScYCgG
+      required:
+        - _id
+        - email
+        - password
+
+    AssetInput:
+      type: object
+      properties:
+        coinId:
+          type: string
+          example: BTC
+        amount:
+          type: number
+          example: 0.5
+      required:
+        - coinId
+        - amount
+
+    Asset:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 65a1b2c3d4e5f6a7b8c9d0e1
+        userId:
+          type: string
+          example: 65a1b2c3d4e5f6a7b8c9d0e1
+        coinId:
+          type: string
+          example: BTC
+        amount:
+          type: number
+          example: 0.5
+      required:
+        - _id
+        - userId
+        - coinId
+        - amount
+
+    CoinDataResponse:
+      type: object
+      properties:
+        fetchInterval:
+          type: integer
+          example: 15000
+        coins:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoinData'
+      required:
+        - fetchInterval
+        - coins
+
+    CoinData:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BTC
+        rate:
+          type: number
+          example: 96623.9114682842
+        volume:
+          type: number
+          example: 20579856602
+        cap:
+          type: number
+          example: 1915843166895
+        delta:
+          $ref: '#/components/schemas/Delta'
+      required:
+        - code
+        - rate
+        - volume
+        - cap
+        - delta
+
+    Delta:
+      type: object
+      properties:
+        hour:
+          type: number
+          example: 0.9995
+        day:
+          type: number
+          example: 1.0076
+        week:
+          type: number
+          example: 0.9877
+        month:
+          type: number
+          example: 0.9315
+        quarter:
+          type: number
+          example: 0.9881
+        year:
+          type: number
+          example: 1.8991
+      required:
+        - hour
+        - day
+        - week
+        - month
+        - quarter
+        - year
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
