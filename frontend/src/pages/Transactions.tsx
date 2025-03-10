@@ -1,4 +1,3 @@
-import React from 'react';
 import CryptoTable, { TableColumn } from "../components/CryptoTable";
 
 interface TransactionData {
