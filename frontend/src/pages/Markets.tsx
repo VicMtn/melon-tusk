@@ -27,8 +27,8 @@ const Markets: React.FC = () => {
   };
 
   const filteredData = cryptoData.filter(crypto => 
-    crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    crypto.code.toLowerCase().includes(searchTerm.toLowerCase())
+    crypto.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    crypto.code?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Définition des colonnes pour le tableau des marchés
