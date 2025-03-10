@@ -3,9 +3,9 @@ import CryptoActionButton from './CryptoActionButton';
 
 // Generic type for crypto data
 export interface BaseCryptoData {
-  code: string;
-  name: string;
-  rate: number;
+  code?: string;
+  name?: string;
+  rate?: number;
   png64?: string;
 }
 
@@ -17,7 +17,7 @@ export interface TableColumn<T> {
   className?: string;
 }
 
-interface CryptoTableProps<T extends BaseCryptoData> {
+interface CryptoTableProps<T> {
   data: T[];
   columns: TableColumn<T>[];
   title?: string;
@@ -27,7 +27,7 @@ interface CryptoTableProps<T extends BaseCryptoData> {
   emptyMessage?: string;
 }
 
-function CryptoTable<T extends BaseCryptoData>({
+function CryptoTable<T>({
   data,
   columns,
   title,
@@ -84,10 +84,10 @@ function CryptoTable<T extends BaseCryptoData>({
             </thead>
             <tbody>
               {data.length > 0 ? (
-                data.map((item) => (
-                  <tr key={item.code} className="hover:bg-gray-50">
+                data.map((item, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
                     {columns.map((column) => (
-                      <td key={`${item.code}-${column.key}`} className={column.className || ''}>
+                      <td key={`${index}-${column.key}`} className={column.className || ''}>
                         {column.render(item)}
                       </td>
                     ))}
@@ -114,7 +114,7 @@ export const CellRenderers = {
     <span className="text-nowrap">#{item.rank}</span>
   ),
   
-  nameWithImage: (item: BaseCryptoData & { png64?: string }) => (
+  nameWithImage: (item: BaseCryptoData) => (
     <div className="flex items-center gap-3">
       {item.png64 && (
         <img 
@@ -131,7 +131,7 @@ export const CellRenderers = {
   ),
   
   price: (item: BaseCryptoData) => (
-    <span>${item.rate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+    <span>${item.rate?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
   ),
   
   percentChange: (item: { delta: { day: number } }) => {
