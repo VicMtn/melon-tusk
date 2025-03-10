@@ -8,13 +8,18 @@ export class AuthService {
     this.secretKey = secretKey;
   }
 
-  async register(email: string, password: string): Promise<IUser> {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+  async register(username: string, email: string, password: string): Promise<IUser> {
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
       throw new Error('User already exists');
     }
 
-    const user = new User({ email, password });
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      throw new Error('Username already exists');
+    }
+
+    const user = new User({ username, email, password });
     await user.save();
     return user;
   }
