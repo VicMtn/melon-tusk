@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CryptoActionButtonProps {
-  action: 'buy' | 'sell';
+  action: 'buy' | 'sell' | 'watchlist';
   fullWidth?: boolean;
   size?: 'sm' | 'md' | 'lg';
   onClick?: () => void;
@@ -29,12 +29,12 @@ const CryptoActionButton: React.FC<CryptoActionButtonProps> = ({
     >
       {action === 'buy' ? (
         <>
-          <span className={`icon-[tabler--${isSquare ? 'square-arrow-down' : 'arrow-down'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
+          <span className={`icon-[tabler--${isSquare ? 'square-arrow-down' : 'square-arrow-down'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
           {!isSquare && 'Buy'}
         </>
       ) : (
         <>
-          <span className={`icon-[tabler--${isSquare ? 'square-arrow-up' : 'arrow-up'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
+          <span className={`icon-[tabler--${isSquare ? 'square-arrow-up' : 'square-arrow-up'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
           {!isSquare && 'Sell'}
         </>
       )}
