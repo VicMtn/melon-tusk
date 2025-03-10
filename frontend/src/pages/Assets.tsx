@@ -191,7 +191,9 @@ const Assets = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
+      <div className="text-xl font-medium">Assets</div>
+      <div className="divider m-0 h-1"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
@@ -240,16 +242,15 @@ const Assets = () => {
       </div>
 
       <div>
-        <h2 className="text-xl font-medium mb-4">Your Portfolio</h2>
+        <h2 className="text-m font-medium mb-4">Your Portfolio</h2>
         <CryptoTable
           data={cryptoData}
           columns={portfolioColumns}
           emptyMessage="Your portfolio is empty. Start by buying some crypto!"
         />
       </div>
-
       <div>
-        <h2 className="text-xl font-medium mb-4">Featured Coins</h2>
+        <h2 className="text-m font-medium mb-4">Featured Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {featuredCoins.map((coin) => (
             <FeaturedCoinCard 
