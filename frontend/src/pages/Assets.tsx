@@ -2,14 +2,11 @@ import { useState, useEffect } from 'react';
 import CryptoActionButton from '../components/CryptoActionButton';
 import FeaturedCoinCard from '../components/FeaturedCoinCard';
 import FundActionButton from '../components/FundActionButton';
+import CryptoTable, { TableColumn, CellRenderers, BaseCryptoData } from '../components/CryptoTable';
 
-interface CryptoData {
-  name: string;
-  code: string;
-  rate: number;
+interface CryptoData extends BaseCryptoData {
   amount: number;
   value: number;
-  png64: string;
   delta: {
     hour: number;
     day: number;
@@ -24,7 +21,6 @@ interface WalletData {
   cryptoAssets: number;
 }
 
-// Adapter pour le format CoinData attendu par CoinCard
 interface CoinData {
   name: string;
   code: string;
@@ -50,11 +46,10 @@ const Assets = () => {
   });
 
   useEffect(() => {
-    // Fetch crypto data
     fetch('/coindata.json')
       .then(response => response.json())
       .then(() => {
-        // Create portfolio data with Bitcoin and Ethereum
+        // Mock data for portfolio
         const portfolioData: CryptoData[] = [
           {
             name: "Bitcoin",
@@ -97,7 +92,7 @@ const Assets = () => {
     });
   };
 
-  // Featured coins data adaptée pour CoinCard
+  // Mock data for featured coins
   const featuredCoins: CoinData[] = [
     {
       name: "Bitcoin",
@@ -161,11 +156,43 @@ const Assets = () => {
     }
   ];
 
+  const portfolioColumns: TableColumn<CryptoData>[] = [
+    {
+      key: 'asset',
+      header: 'Asset',
+      render: CellRenderers.nameWithImage
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      render: (item) => <span>{formatNumber(item.amount)} {item.code}</span>
+    },
+    {
+      key: 'price',
+      header: 'Price',
+      render: CellRenderers.price
+    },
+    {
+      key: 'value',
+      header: 'Value',
+      render: (item) => <span>${formatNumber(item.value)}</span>
+    },
+    {
+      key: 'change',
+      header: '24h',
+      render: CellRenderers.percentChange
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: CellRenderers.buySellActions,
+      className: 'text-center'
+    }
+  ];
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Balance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Total Balance Card */}
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalBalance)}</p>
@@ -185,7 +212,6 @@ const Assets = () => {
           </div>
         </div>
 
-        {/* Available Cash Card */}
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Available Cash</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.availableCash)}</p>
@@ -199,7 +225,6 @@ const Assets = () => {
           </div>
         </div>
 
-        {/* Crypto Assets Card */}
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Crypto Assets</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.cryptoAssets)}</p>
@@ -214,59 +239,15 @@ const Assets = () => {
         </div>
       </div>
 
-      {/* Portfolio Section */}
       <div>
         <h2 className="text-xl font-medium mb-4">Your Portfolio</h2>
-        <div className="border-base-content/25 w-full rounded-lg border bg-white">
-          <div className="overflow-x-auto">
-            <table className="table rounded w-full">
-              <thead>
-                <tr className="uppercase text-xs text-gray-500 bg-gray-50">
-                  <th className="font-medium">Asset</th>
-                  <th className="font-medium">Amount</th>
-                  <th className="font-medium">Price</th>
-                  <th className="font-medium">Value</th>
-                  <th className="font-medium">24h</th>
-                  <th className="font-medium text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cryptoData.map((crypto) => (
-                  <tr key={crypto.code} className="hover:bg-gray-50">
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={crypto.png64}
-                          alt={crypto.name}
-                          className="w-8 h-8 rounded-full"
-                        />
-                        <div>
-                          <div className="font-medium">{crypto.code}</div>
-                          <div className="text-sm text-gray-500">{crypto.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{formatNumber(crypto.amount)}</td>
-                    <td>${formatNumber(crypto.rate)}</td>
-                    <td>${formatNumber(crypto.value)}</td>
-                    <td className={crypto.delta.day >= 0 ? 'text-green-500' : 'text-red-500'}>
-                      {crypto.delta.day >= 0 ? '+' : ''}{crypto.delta.day.toFixed(2)}%
-                    </td>
-                    <td className="text-center">
-                      <div className="flex justify-center gap-2">
-                        <CryptoActionButton action="buy" size="sm" />
-                        <CryptoActionButton action="sell" size="sm" />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <CryptoTable
+          data={cryptoData}
+          columns={portfolioColumns}
+          emptyMessage="Your portfolio is empty. Start by buying some crypto!"
+        />
       </div>
 
-      {/* Featured Coins Section */}
       <div>
         <h2 className="text-xl font-medium mb-4">Featured Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -278,10 +259,6 @@ const Assets = () => {
             />
           ))}
         </div>
-      </div>
-
-      <div className="text-center text-gray-500 text-sm mt-4">
-        MelonTusk © 2025 - All right reserved.
       </div>
     </div>
   );
