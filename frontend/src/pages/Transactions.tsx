@@ -155,7 +155,6 @@ const Transactions = () => {
   ];
 
   return (
-    <div className="p-6">
       <CryptoTable<TransactionData>
         data={mockTransactions}
         columns={columns}
@@ -163,7 +162,6 @@ const Transactions = () => {
         showSearch={true}
         emptyMessage="No transactions found"
       />
-    </div>
   );
 };
 
