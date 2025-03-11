@@ -9,7 +9,7 @@ import { authMiddleware } from './middleware/authMiddleware';
 import Asset from './models/Asset';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
-
+import { CoinDeskService } from './services/CoinDeskService';
 
 
 const app = express();
@@ -23,7 +23,19 @@ mongoose
   .then(() => console.log('Connected to MongoDB: melon-tusk'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-  startFetching();
+startFetching(); // Start fetching coin data every defined interval
+
+let coinDeskService = new CoinDeskService();
+
+app.get('/news', authMiddleware, async (req, res) => {
+  try {
+    const newsArticles = await coinDeskService.fetchNewsArticles();
+    res.json(newsArticles);
+  } catch (error) {
+    console.error('Error fetching news articles:', error);
+    res.status(500).json({ error: 'Failed to fetch news articles' });
+  }
+});
 
 const swaggerDocument = YAML.load('src/openapi.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
