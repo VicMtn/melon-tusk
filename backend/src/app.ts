@@ -4,9 +4,13 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { startFetching } from './services/liveCoinWatchService';
-import { AuthService } from './services/AuthService.js';
+import { AuthService } from './services/AuthService';
 import { authMiddleware } from './middleware/authMiddleware';
 import Asset from './models/Asset';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -20,6 +24,9 @@ mongoose
   .catch((err) => console.error('MongoDB connection error:', err));
 
   startFetching();
+
+const swaggerDocument = YAML.load('src/openapi.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const authService = new AuthService(process.env.JWT_SECRET!, process.env.LCW_CODES!.split(','));
 
