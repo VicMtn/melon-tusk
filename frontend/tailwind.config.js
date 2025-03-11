@@ -12,6 +12,6 @@ export default {
     },
   },
   flyonui: {
-    themes: ['gourmet', 'corporate'],
+    themes: ["light", "dark", "gourmet", "corporate", "luxury", "soft"]
   },
 };
