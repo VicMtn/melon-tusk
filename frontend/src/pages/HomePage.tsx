@@ -31,6 +31,12 @@ const HomePage: React.FC = () => {
           <ArticleCard article={articleData.Data[0]} />
           <ArticleCard article={articleData.Data[1]} />
         </div>
+        <div className="divider m-0 h-1"></div>
+        <div className="text-m font-medium">Top Events</div>
+        <div className="flex gap-4">
+          <ArticleCard article={articleData.Data[0]} />
+          <ArticleCard article={articleData.Data[1]} />
+        </div>
         </div>
     </>
   );
