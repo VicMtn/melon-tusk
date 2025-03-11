@@ -3,6 +3,7 @@ import CryptoActionButton from '../components/CryptoActionButton';
 import FeaturedCoinCard from '../components/FeaturedCoinCard';
 import FundActionButton from '../components/FundActionButton';
 import CryptoTable, { TableColumn, CellRenderers, BaseCryptoData } from '../components/CryptoTable';
+import TransactionModal from '../components/TransactionModal';
 
 interface CryptoData extends BaseCryptoData {
   amount: number;
@@ -44,6 +45,16 @@ const Assets = () => {
     availableCash: 10000.00,
     cryptoAssets: 54926.32
   });
+
+  // Transaction modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
+  const [selectedCrypto, setSelectedCrypto] = useState<{
+    code: string;
+    name: string;
+    price: number;
+    icon?: string;
+  } | null>(null);
 
   useEffect(() => {
     fetch('/coindata.json')
@@ -156,6 +167,28 @@ const Assets = () => {
     }
   ];
 
+  const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: CryptoData) => {
+    setModalType(type);
+    if (crypto) {
+      setSelectedCrypto({
+        code: crypto.code || '',
+        name: crypto.name || '',
+        price: crypto.rate || 0,
+        icon: crypto.png64
+      });
+    } else {
+      setSelectedCrypto(null);
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleTransactionSubmit = async (amount: number, total: number) => {
+    // TODO: Implement actual transaction logic
+    console.log(`Transaction: ${modalType}`, { amount, total });
+    // Mock success
+    return Promise.resolve();
+  };
+
   const portfolioColumns: TableColumn<CryptoData>[] = [
     {
       key: 'asset',
@@ -185,7 +218,20 @@ const Assets = () => {
     {
       key: 'actions',
       header: 'Actions',
-      render: CellRenderers.buySellActions,
+      render: (item) => (
+        <div className="flex justify-center gap-2">
+          <CryptoActionButton
+            action="buy"
+            size="sm"
+            onClick={() => handleTransactionClick('buy', item)}
+          />
+          <CryptoActionButton
+            action="sell"
+            size="sm"
+            onClick={() => handleTransactionClick('sell', item)}
+          />
+        </div>
+      ),
       className: 'text-center'
     }
   ];
@@ -219,10 +265,18 @@ const Assets = () => {
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.availableCash)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
-              <FundActionButton action="deposit" fullWidth={true} />
+              <FundActionButton 
+                action="deposit"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('deposit')}
+              />
             </div>
             <div className="flex-1">
-              <FundActionButton action="withdraw" fullWidth={true} />
+              <FundActionButton 
+                action="withdraw"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('withdraw')}
+              />
             </div>
           </div>
         </div>
@@ -232,10 +286,18 @@ const Assets = () => {
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.cryptoAssets)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
-              <CryptoActionButton action="buy" fullWidth={true} />
+              <CryptoActionButton 
+                action="buy"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('buy')}
+              />
             </div>
             <div className="flex-1">
-              <CryptoActionButton action="sell" fullWidth={true} />
+              <CryptoActionButton 
+                action="sell"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('sell')}
+              />
             </div>
           </div>
         </div>
@@ -256,11 +318,32 @@ const Assets = () => {
             <FeaturedCoinCard 
               key={coin.code} 
               coin={coin} 
-              onBuy={() => console.log(`Buy ${coin.code}`)}
+              onBuy={() => handleTransactionClick('buy', {
+                ...coin,
+                amount: 0,
+                value: 0,
+                delta: {
+                  hour: coin.delta.hour - 1,
+                  day: coin.delta.day - 1,
+                  week: coin.delta.week - 1,
+                  month: coin.delta.month - 1
+                }
+              })}
             />
           ))}
         </div>
       </div>
+
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        type={modalType}
+        cryptoData={selectedCrypto || undefined}
+        balance={modalType === 'withdraw' ? walletData.availableCash : 
+                modalType === 'sell' ? (cryptoData.find(c => c.code === selectedCrypto?.code)?.amount || 0) : 
+                walletData.availableCash}
+        onSubmit={handleTransactionSubmit}
+      />
     </div>
   );
 };
