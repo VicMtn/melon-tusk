@@ -1,52 +1,64 @@
-import axios from 'axios';
-import { Coin } from '../models/Coin.js';
+import createAxiosInstance from "./index";
+import config from "../config/envConfig";
+import { Itop50Coins, SingleCoinResponse } from "../interfaces/ICoins";
 
+const lcwApi = createAxiosInstance({
+  baseURL: "https://api.livecoinwatch.com",
+  apiKeys: {
+    "x-api-key": config.lcw_api_key,
+  },
+});
 
-export const fetchCoinData = async (): Promise<void> => {
+export const getCoinsTop50List = async (): Promise<Itop50Coins> => {
   try {
-    const response = await axios.post(
-      'https://api.livecoinwatch.com/coins/map',
-      {
-        codes: process.env.LCW_CODES!.split(','),
-        currency: 'USD',
-        sort: 'rank',
-        order: 'ascending',
-        offset: 0,
-        limit: 0,
-        meta: false,
-      },
-      {
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': process.env.LCW_KEY!,
-        },
-      }
-    );
-
-    const coinData = response.data.map(
-      (coin: any) =>
-        new Coin(
-          coin.code,
-          coin.rate,
-          coin.volume,
-          coin.cap,
-          coin.delta
-        )
-    );
-
-    for (const coin of coinData) {
-      await coin.save();
-    }
-
-    console.log('Coin data saved to MongoDB');
+    const response = await lcwApi.post("/coins/list", {
+      currency: "USD",
+      sort: "rank",
+      order: "ascending",
+      offset: 0,
+      limit: 50,
+      meta: true,
+    });
+    return response.data;
   } catch (error) {
-    console.error('Error fetching or saving coin data:', error);
+    console.error("Error fetching coins list:", error);
+    throw error;
   }
 };
 
+export const getCoinByCode = async (
+  code: string
+): Promise<SingleCoinResponse> => {
+  try {
+    console.log("Fetching coin data for:", code);
+    const response = await lcwApi.post("/coins/single", {
+      currency: "USD",
+      code: code.toUpperCase(),
+      meta: true,
+    });
 
-export const startFetching = () => {
-  fetchCoinData();
-  setInterval(fetchCoinData, parseInt(process.env.FETCH_INTERVAL!, 10));
+    if (!response.data) {
+      throw new Error("Coin not found");
+    }
+
+    console.log("Coin data received:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `Error fetching coin ${code}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
 
+export const updateCoinData = async (): Promise<void> => {
+  try {
+    const coins = await getCoinsTop50List();
+    setInterval(async () => {
+      const coins = await getCoinsTop50List();
+    }, config.lcwInterval);
+  } catch (error) {
+    console.error("Error updating coin data:", error);
+  }
+};
