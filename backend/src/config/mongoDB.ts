@@ -5,7 +5,7 @@ const mongoURI: string = config.mongoUri;
 
 const mongoClient = async (): Promise<void> => {
   try {
-    await mongoose.connect(mongoURI,)
+    await mongoose.connect(mongoURI)
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
