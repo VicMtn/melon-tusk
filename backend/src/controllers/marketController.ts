@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { getFearAndGreedIndex } from '../services/coinMarketCapService';
 import { getCoinsTop50List, getCoinByCode } from '../services/liveCoinWatchService';
 import { getLatestArticles } from '../services/coinDeskService';
+import Coin from '../models/Coin';
+import envConfig from '../config/envConfig';
 
 export const getMarketFearAndGreed = async (req: Request, res: Response) => {
     try {
@@ -48,4 +50,29 @@ export const getNews = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch latest articles' });
     }
+};
+
+export const startPeriodicCoinUpdate = () => {
+    const updateCoins = async () => {
+        try {
+            const coinsData = await getCoinsTop50List();
+            if (!Array.isArray(coinsData)) {
+                console.error('Invalid response format. Expected an array of coins but got:', typeof coinsData);
+                return;
+            }
+            await Coin.bulkInsertTop50List(coinsData);
+            console.log('Periodic coin update completed successfully');
+        } catch (error) {
+            console.error('Error during periodic coin update:', error);
+            if (error instanceof Error) {
+                console.error('Error details:', error.message);
+            }
+        }
+    };
+
+    updateCoins();
+
+    const interval = envConfig.lcwInterval;
+    setInterval(updateCoins, interval);
+    console.log(`Periodic coin update scheduled every ${interval/1000} seconds`);
 }; 
