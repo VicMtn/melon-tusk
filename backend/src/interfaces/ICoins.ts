@@ -2,7 +2,6 @@ import { Document, Model } from "mongoose";
 
 export interface ICoin extends Document {
     name: string;
-    symbol: string;
     rank: number;
     age: number;
     color: string;
@@ -15,9 +14,28 @@ export interface ICoin extends Document {
     pairs: number;
     allTimeHighUSD: number;
     circulatingSupply: number;
-    totalSupply: number | null;
-    maxSupply: number | null;
-    categories: string[];
+    totalSupply?: number | null;
+    maxSupply?: number | null;
+    categories?: string[];
+    links: {
+        website?: string,
+        whitepaper?: string,
+        twitter?: string;
+        reddit?: string;
+        telegram?: string;
+        discord?: string;
+        medium?: string;
+        instagram?: string;
+        tiktok?: string;
+        youtube?: string;
+        linkedin?: string;
+        twitch?: string;
+        spotify?: string;
+        naver?: string;
+        wechat?: string;
+        soundcloud?: string;
+    },
+    code: string;
     rate: number;
     volume: number;
     cap: number;
