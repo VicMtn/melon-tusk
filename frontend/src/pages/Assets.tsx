@@ -1,0 +1,351 @@
+import { useState, useEffect } from 'react';
+import CryptoActionButton from '../components/CryptoActionButton';
+import FeaturedCoinCard from '../components/FeaturedCoinCard';
+import FundActionButton from '../components/FundActionButton';
+import CryptoTable, { TableColumn, CellRenderers, BaseCryptoData } from '../components/CryptoTable';
+import TransactionModal from '../components/TransactionModal';
+
+interface CryptoData extends BaseCryptoData {
+  amount: number;
+  value: number;
+  delta: {
+    hour: number;
+    day: number;
+    week: number;
+    month: number;
+  };
+}
+
+interface WalletData {
+  totalBalance: number;
+  availableCash: number;
+  cryptoAssets: number;
+}
+
+interface CoinData {
+  name: string;
+  code: string;
+  png64: string;
+  rate: number;
+  rank: number;
+  delta: {
+    hour: number;
+    day: number;
+    week: number;
+    month: number;
+    quarter: number;
+    year: number;
+  };
+}
+
+const Assets = () => {
+  const [cryptoData, setCryptoData] = useState<CryptoData[]>([]);
+  const [walletData] = useState<WalletData>({
+    totalBalance: 64926.32,
+    availableCash: 10000.00,
+    cryptoAssets: 54926.32
+  });
+
+  // Transaction modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
+  const [selectedCrypto, setSelectedCrypto] = useState<{
+    code: string;
+    name: string;
+    price: number;
+    icon?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch('/coindata.json')
+      .then(response => response.json())
+      .then(() => {
+        // Mock data for portfolio
+        const portfolioData: CryptoData[] = [
+          {
+            name: "Bitcoin",
+            code: "BTC",
+            rate: 96265.38,
+            amount: 0.50,
+            value: 48132.69,
+            png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/btc.png",
+            delta: {
+              hour: 0,
+              day: -0.08,
+              week: 1.12,
+              month: 0
+            }
+          },
+          {
+            name: "Ethereum",
+            code: "ETH",
+            rate: 2717.45,
+            amount: 2.50,
+            value: 6793.63,
+            png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/eth.png",
+            delta: {
+              hour: 0,
+              day: 0.45,
+              week: 4.37,
+              month: 0.28
+            }
+          }
+        ];
+        setCryptoData(portfolioData);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  const formatNumber = (num: number): string => {
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // Mock data for featured coins
+  const featuredCoins: CoinData[] = [
+    {
+      name: "Bitcoin",
+      code: "BTC",
+      rate: 96265.38,
+      rank: 1,
+      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/btc.png",
+      delta: {
+        hour: 1.00,
+        day: 0.9992,
+        week: 1.0112,
+        month: 0.8946,
+        quarter: 0.9858,
+        year: 1.8222
+      }
+    },
+    {
+      name: "Ethereum",
+      code: "ETH",
+      rate: 2717.45,
+      rank: 2,
+      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/eth.png",
+      delta: {
+        hour: 1.0028,
+        day: 1.0045,
+        week: 1.0437,
+        month: 1.0028,
+        quarter: 1.0,
+        year: 1.0
+      }
+    },
+    {
+      name: "XRP",
+      code: "XRP",
+      rate: 2.61,
+      rank: 3,
+      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/xrp.png",
+      delta: {
+        hour: 1.0075,
+        day: 0.9986,
+        week: 1.0887,
+        month: 1.0,
+        quarter: 1.0,
+        year: 1.0
+      }
+    },
+    {
+      name: "Tether",
+      code: "USDT",
+      rate: 1.00,
+      rank: 4,
+      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/usdt.png",
+      delta: {
+        hour: 0.9999,
+        day: 0.9988,
+        week: 0.9992,
+        month: 1.0,
+        quarter: 1.0,
+        year: 1.0
+      }
+    }
+  ];
+
+  const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: CryptoData) => {
+    setModalType(type);
+    if (crypto) {
+      setSelectedCrypto({
+        code: crypto.code || '',
+        name: crypto.name || '',
+        price: crypto.rate || 0,
+        icon: crypto.png64
+      });
+    } else {
+      setSelectedCrypto(null);
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleTransactionSubmit = async (amount: number, total: number) => {
+    // TODO: Implement actual transaction logic
+    console.log(`Transaction: ${modalType}`, { amount, total });
+    // Mock success
+    return Promise.resolve();
+  };
+
+  const portfolioColumns: TableColumn<CryptoData>[] = [
+    {
+      key: 'asset',
+      header: 'Asset',
+      render: CellRenderers.nameWithImage
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      render: (item) => <span>{formatNumber(item.amount)} {item.code}</span>
+    },
+    {
+      key: 'price',
+      header: 'Price',
+      render: CellRenderers.price
+    },
+    {
+      key: 'value',
+      header: 'Value',
+      render: (item) => <span>${formatNumber(item.value)}</span>
+    },
+    {
+      key: 'change',
+      header: '24h',
+      render: CellRenderers.percentChange
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (item) => (
+        <div className="flex justify-center gap-2">
+          <CryptoActionButton
+            action="buy"
+            size="sm"
+            onClick={() => handleTransactionClick('buy', item)}
+          />
+          <CryptoActionButton
+            action="sell"
+            size="sm"
+            onClick={() => handleTransactionClick('sell', item)}
+          />
+        </div>
+      ),
+      className: 'text-center'
+    }
+  ];
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="text-xl font-medium">Assets</div>
+      <div className="divider m-0 h-1"></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card bg-white shadow-sm rounded-lg p-5">
+          <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalBalance)}</p>
+          <div className="flex justify-between text-sm">
+            <div>
+              <span className="text-gray-500">24h</span>
+              <span className="text-red-500 ml-1">-0.01%</span>
+            </div>
+            <div>
+              <span className="text-gray-500">7d</span>
+              <span className="text-green-500 ml-1">+1.52%</span>
+            </div>
+            <div>
+              <span className="text-gray-500">30d</span>
+              <span className="text-red-500 ml-1">-11.52%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-white shadow-sm rounded-lg p-5">
+          <h3 className="text-gray-500 text-lg font-medium mb-1">Available Cash</h3>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.availableCash)}</p>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <FundActionButton 
+                action="deposit"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('deposit')}
+              />
+            </div>
+            <div className="flex-1">
+              <FundActionButton 
+                action="withdraw"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('withdraw')}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="card bg-white shadow-sm rounded-lg p-5">
+          <h3 className="text-gray-500 text-lg font-medium mb-1">Crypto Assets</h3>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.cryptoAssets)}</p>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <CryptoActionButton 
+                action="buy"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('buy')}
+              />
+            </div>
+            <div className="flex-1">
+              <CryptoActionButton 
+                action="sell"
+                fullWidth={true}
+                onClick={() => handleTransactionClick('sell')}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-m font-medium mb-4">Your Portfolio</h2>
+        <CryptoTable
+          data={cryptoData}
+          columns={portfolioColumns}
+          emptyMessage="Your portfolio is empty. Start by buying some crypto!"
+        />
+      </div>
+      <div>
+        <h2 className="text-m font-medium mb-4">Featured Coins</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {featuredCoins.map((coin) => (
+            <FeaturedCoinCard 
+              key={coin.code} 
+              coin={coin} 
+              onBuy={() => handleTransactionClick('buy', {
+                ...coin,
+                amount: 0,
+                value: 0,
+                delta: {
+                  hour: coin.delta.hour - 1,
+                  day: coin.delta.day - 1,
+                  week: coin.delta.week - 1,
+                  month: coin.delta.month - 1
+                }
+              })}
+            />
+          ))}
+        </div>
+      </div>
+
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        type={modalType}
+        cryptoData={selectedCrypto || undefined}
+        balance={modalType === 'withdraw' ? walletData.availableCash : 
+                modalType === 'sell' ? (cryptoData.find(c => c.code === selectedCrypto?.code)?.amount || 0) : 
+                walletData.availableCash}
+        onSubmit={handleTransactionSubmit}
+      />
+    </div>
+  );
+};
+
+export default Assets;
