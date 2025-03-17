@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import User from "../models/User";
 import Wallet from "../models/Wallet";
 import Transaction from "../models/Transaction";
@@ -8,8 +8,33 @@ import envConfig from "../config/envConfig";
 // Configuration MongoDB
 const MONGODB_URI = envConfig.mongoUri;
 
+// Interfaces pour les données de test
+interface TestAsset {
+  code: string;
+  amount: number;
+}
+
+interface TestTransaction {
+  type: 'deposit' | 'buy' | 'sell' | 'withdraw';
+  amount: number;
+  total: number;
+  currency?: string;
+  code?: string;
+  rate?: number;
+  date?: Date;
+}
+
+interface TestUser {
+  username: string;
+  email: string;
+  password: string;
+  initialBalance: number;
+  assets: TestAsset[];
+  transactions: TestTransaction[];
+}
+
 // Données de test
-const users = [
+const users: TestUser[] = [
   {
     username: 'admin',
     email: 'admin@example.com',
@@ -78,11 +103,6 @@ const users = [
   }
 ];
 
-async function hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
-}
-
 async function seed() {
   try {
     // Connexion à MongoDB
@@ -97,55 +117,44 @@ async function seed() {
     ]);
     console.log('Database cleaned');
 
-    // Créer les utilisateurs avec leurs wallets et transactions
+    // Créer les utilisateurs
     for (const userData of users) {
-      try {
-        // 1. Créer le wallet
-        const wallet = await Wallet.createWallet();
-        
-        // 2. Mettre à jour le solde et les assets
-        await Wallet.findByIdAndUpdate(wallet._id, {
-          balance: userData.initialBalance,
-          assets: userData.assets
-        });
+      const { transactions, assets, initialBalance, ...userInput } = userData;
+      
+      // Créer le wallet d'abord
+      const wallet = await Wallet.create({
+        balance: initialBalance,
+        assets: assets.map(asset => ({
+          code: asset.code,
+          amount: asset.amount
+        }))
+      });
 
-        // 3. Hasher le mot de passe
-        const hashedPassword = await hashPassword(userData.password);
+      // Créer l'utilisateur avec le wallet
+      const user = await User.createUser({
+        ...userInput,
+        wallet: wallet._id as Types.ObjectId
+      });
 
-        // 4. Créer l'utilisateur
-        const user = await User.create({
-          username: userData.username,
-          email: userData.email,
-          password: hashedPassword,
-          wallet: wallet._id
-        });
-
-        // 5. Créer les transactions
-        const transactions = userData.transactions.map(t => ({
+      // Créer les transactions
+      await Transaction.insertMany(
+        transactions.map(transaction => ({
+          ...transaction,
           userId: user._id,
-          walletId: wallet._id,
-          type: t.type,
-          code: t.code,
-          amount: t.amount,
-          rate: t.rate,
-          total: t.total,
-          currency: t.currency || 'USD'
-        }));
+          walletId: wallet._id
+        }))
+      );
 
-        await Transaction.insertMany(transactions);
-        console.log(`Created user: ${userData.username} with wallet and transactions`);
-      } catch (error) {
-        console.error(`Error creating user ${userData.username}:`, error);
-      }
+      console.log(`Created user: ${userData.username} with wallet and transactions`);
     }
 
-    console.log('Seeding completed successfully');
+    console.log('Seed completed successfully');
     process.exit(0);
   } catch (error) {
-    console.error('Error during seeding:', error);
+    console.error('Error seeding database:', error);
     process.exit(1);
   }
 }
 
-// Exécuter le script
+// Exécuter le seeder
 seed(); 
