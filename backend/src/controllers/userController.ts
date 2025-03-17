@@ -59,7 +59,17 @@ export const login = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ id: user._id }, envConfig.jwtSecret, { expiresIn: '2h' });
-        res.json({ token });
+        
+        // Renvoyer le token et les informations de l'utilisateur
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                wallet: user.wallet
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error during login' });
     }
