@@ -5,7 +5,7 @@ import router from './routes';
 import envConfig from './config/envConfig';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger';
-import { updateCoinData } from './services/liveCoinWatchService';
+import { startPeriodicCoinUpdate } from './controllers/marketController';
 
 // Configuration
 const app = express();
@@ -39,8 +39,8 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     res.status(500).json({ error: 'Something broke!', message: err.message });
 });
 
-// Start the coin data update process
-updateCoinData();
+// Start periodic coin updates
+startPeriodicCoinUpdate();
 console.log('Coin data update process started');
 
 // Add listen port
