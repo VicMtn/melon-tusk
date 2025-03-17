@@ -1,44 +1,183 @@
-import CoinData, { ICoinData } from './CoinData.js';
+import mongoose, { Schema } from 'mongoose';
+import { ICoin, CoinModel } from '../interfaces/ICoins';
 
-export class Coin {
-  constructor(
-    public code: string,
-    public rate: number,
-    public volume: number,
-    public cap: number,
-    public delta: {
-      hour: number;
-      day: number;
-      week: number;
-      month: number;
-      quarter: number;
-      year: number;
+const coinSchema = new Schema({
+    name: { 
+        type: String, 
+        required: true 
+    },
+    symbol: { 
+        type: String, 
+        required: true,
+        unique: true,
+        uppercase: true,
+        index: true
+    },
+    rank: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+    age: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    color: {
+        type: String,
+        required: true
+    },
+    png32: {
+        type: String,
+        required: true
+    },
+    png64: {
+        type: String,
+        required: true
+    },
+    webp32: {
+        type: String,
+        required: true
+    },
+    webp64: {
+        type: String,
+        required: true
+    },
+    exchanges: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    markets: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    pairs: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    allTimeHighUSD: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    circulatingSupply: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    totalSupply: {
+        type: Number,
+        default: null
+    },
+    maxSupply: {
+        type: Number,
+        default: null
+    },
+    categories: [{
+        type: String
+    }],
+    rate: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    volume: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    cap: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    delta: {
+        hour: {
+            type: Number,
+            required: true
+        },
+        day: {
+            type: Number,
+            required: true
+        },
+        week: {
+            type: Number,
+            required: true
+        },
+        month: {
+            type: Number,
+            required: true
+        },
+        quarter: {
+            type: Number,
+            required: true
+        },
+        year: {
+            type: Number,
+            required: true
+        }
+    },
+    lastUpdated: { 
+        type: Date, 
+        default: Date.now 
     }
-  ) {}
+}, {
+    timestamps: true
+});
 
-  static async getInstancesInLastNHours(code: string, hours: number): Promise<ICoinData[]> {
-    const now = new Date();
-    const past = new Date(now.getTime() - hours * 60 * 60 * 1000);
+// Index pour optimiser les requêtes
+coinSchema.index({ rank: 1 });
+coinSchema.index({ cap: -1 });
+coinSchema.index({ volume: -1 });
 
-    return CoinData.find({
-      code,
-      timestamp: { $gte: past, $lte: now },
-    }).exec();
-  }
+// Méthodes CRUD
+coinSchema.statics.bulkInsertTop50List = async function(
+    coinsData: ICoin[]
+): Promise<void> {
+    try {
+        // 1. Supprimer toutes les anciennes données
+        await this.deleteMany({});
 
-  static async getLatestInstance(code: string): Promise<ICoinData | null> {
-    return CoinData.findOne({ code }).sort({ timestamp: -1 }).exec();
-  }
+        // 2. Insérer les nouvelles données
+        const newCoins = coinsData.map(coin => ({
+            ...coin,
+            lastUpdated: new Date()
+        }));
 
-  async save(): Promise<ICoinData> {
-    const coinData = new CoinData({
-      code: this.code,
-      rate: this.rate,
-      volume: this.volume,
-      cap: this.cap,
-      delta: this.delta,
-    });
+        await this.insertMany(newCoins);
+        
+        console.log(`Successfully updated ${coinsData.length} coins`);
+    } catch (error) {
+        console.error('Error during bulk insert:', error);
+        throw error;
+    }
+};
 
-    return coinData.save();
-  }
-}
+coinSchema.statics.findByCode = async function(
+    code: string
+): Promise<ICoin | null> {
+    return this.findOne({ code: code.toUpperCase() });
+};
+
+coinSchema.statics.findTopCoins = async function(
+    limit: number = 50
+): Promise<ICoin[]> {
+    return this.find()
+        .sort({ rank: 1 })
+        .limit(limit);
+};
+
+coinSchema.statics.getCoinList = async function(): Promise<ICoin[]> {
+    return this.find()
+        .sort({ rank: 1 })
+        .lean()  // Optimisation pour la lecture seule
+        .select('name symbol rank png64 allTimeHighUSD rate volume cap delta lastUpdated');
+};
+
+// Création du modèle avec les interfaces
+const Coin = mongoose.model<ICoin, CoinModel>('Coin', coinSchema);
+
+export default Coin;
