@@ -2,6 +2,7 @@ import { Document, Model } from "mongoose";
 
 export interface ICoin extends Document {
     name: string;
+    symbol?: string | null;
     rank: number;
     age: number;
     color: string;
@@ -9,36 +10,37 @@ export interface ICoin extends Document {
     png64: string;
     webp32: string;
     webp64: string;
-    exchanges: number;
-    markets: number;
-    pairs: number;
+    exchanges?: number | null;
+    markets?: number | null;
+    pairs?: number | null;
     allTimeHighUSD: number;
     circulatingSupply: number;
-    totalSupply?: number | null;
+    totalSupply: number;
     maxSupply?: number | null;
-    categories?: string[];
+    categories?: string[] | null;
     links: {
-        website?: string,
-        whitepaper?: string,
-        twitter?: string;
-        reddit?: string;
-        telegram?: string;
-        discord?: string;
-        medium?: string;
-        instagram?: string;
-        tiktok?: string;
-        youtube?: string;
-        linkedin?: string;
-        twitch?: string;
-        spotify?: string;
-        naver?: string;
-        wechat?: string;
-        soundcloud?: string;
+        website: string | null,
+        whitepaper: string | null,
+        twitter: string | null,
+        reddit: string | null,
+        telegram: string | null,
+        discord: string | null,
+        medium: string | null,
+        instagram: string | null,
+        tiktok: string | null,
+        youtube: string | null,
+        linkedin: string | null,
+        twitch: string | null,
+        spotify: string | null,
+        naver: string | null,
+        wechat: string | null,
+        soundcloud: string | null;
     },
     code: string;
     rate: number;
     volume: number;
     cap: number;
+    liquidity?: number | null;
     delta: {
         hour: number;
         day: number;
