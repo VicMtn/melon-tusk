@@ -7,11 +7,7 @@ const coinSchema = new Schema({
         required: true 
     },
     symbol: { 
-        type: String, 
-        required: true,
-        unique: true,
-        uppercase: true,
-        index: true
+        type: String
     },
     rank: {
         type: Number,
@@ -25,7 +21,6 @@ const coinSchema = new Schema({
     },
     color: {
         type: String,
-        required: true
     },
     png32: {
         type: String,
@@ -45,27 +40,22 @@ const coinSchema = new Schema({
     },
     exchanges: {
         type: Number,
-        required: true,
         min: 0
     },
     markets: {
         type: Number,
-        required: true,
         min: 0
     },
     pairs: {
         type: Number,
-        required: true,
         min: 0
     },
     allTimeHighUSD: {
         type: Number,
-        required: true,
         min: 0
     },
     circulatingSupply: {
         type: Number,
-        required: true,
         min: 0
     },
     totalSupply: {
@@ -109,15 +99,12 @@ const coinSchema = new Schema({
         },
         month: {
             type: Number,
-            required: true
         },
         quarter: {
             type: Number,
-            required: true
         },
         year: {
             type: Number,
-            required: true
         }
     },
     lastUpdated: { 
@@ -129,9 +116,10 @@ const coinSchema = new Schema({
 });
 
 // Index pour optimiser les requêtes
-coinSchema.index({ rank: 1 });
-coinSchema.index({ cap: -1 });
-coinSchema.index({ volume: -1 });
+//coinSchema.index({ code: 1});
+//coinSchema.index({ rank: 1 });
+//coinSchema.index({ cap: -1 });
+//coinSchema.index({ volume: -1 });
 
 // Méthodes CRUD
 coinSchema.statics.bulkInsertTop50List = async function(
@@ -179,5 +167,24 @@ coinSchema.statics.getCoinList = async function(): Promise<ICoin[]> {
 
 // Création du modèle avec les interfaces
 const Coin = mongoose.model<ICoin, CoinModel>('Coin', coinSchema);
+
+// Fonction pour réinitialiser les index
+/*
+export const resetIndexes = async () => {
+    try {
+        // Supprimer tous les index existants sauf _id
+        await Coin.collection.dropIndexes();
+        console.log('Tous les index ont été supprimés');
+        
+        // Recréer uniquement les index nécessaires
+        await Coin.collection.createIndex({ rank: 1 });
+        await Coin.collection.createIndex({ cap: -1 });
+        await Coin.collection.createIndex({ volume: -1 });
+        console.log('Index nécessaires recréés avec succès');
+    } catch (error) {
+        console.error('Erreur lors de la réinitialisation des index:', error);
+        throw error;
+    }
+};*/
 
 export default Coin;
