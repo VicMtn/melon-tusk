@@ -1,107 +1,51 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import { startFetching } from './services/liveCoinWatchService';
-import { AuthService } from './services/AuthService';
-import { authMiddleware } from './middleware/authMiddleware';
-import Asset from './models/Asset';
+import mongoClient from './config/mongoDB';
+import router from './routes';
+import envConfig from './config/envConfig';
 import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
-import { CoinDeskService } from './services/CoinDeskService';
+import { specs } from './config/swagger';
+import { updateCoinData } from './services/liveCoinWatchService';
 
-
+// Configuration
 const app = express();
-const PORT = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(() => console.log('Connected to MongoDB: melon-tusk'))
-  .catch((err) => console.error('MongoDB connection error:', err));
-
-startFetching(); // Start fetching coin data every defined interval
-
-let coinDeskService = new CoinDeskService();
-
-app.get('/news', authMiddleware, async (req, res) => {
-  try {
-    const newsArticles = await coinDeskService.fetchNewsArticles();
-    res.json(newsArticles);
-  } catch (error) {
-    console.error('Error fetching news articles:', error);
-    res.status(500).json({ error: 'Failed to fetch news articles' });
-  }
-});
-
-const swaggerDocument = YAML.load('src/openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-const authService = new AuthService(process.env.JWT_SECRET!, process.env.LCW_CODES!.split(','));
-
-app.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
-
-  try {
-    const user = await authService.register(username, email, password);
-    res.status(201).json({ message: 'User registered successfully', user });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
-});
-
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const token = await authService.login(email, password);
-    res.json({ token });
-  } catch (error) {
-    res.status(401).json({ error: (error as Error).message });
-  }
-});
-
-app.put('/assets', authMiddleware, async (req, res) => {
-  const userId = (req as any).user.userId;
-  const assets: { coinId: string; amount: number }[] = req.body;
-
-  try {
-    const validCoins = process.env.LCW_CODES!.split(',');
-    for (const asset of assets) {
-      if (!validCoins.includes(asset.coinId)) {
-        return res.status(400).json({ error: `Invalid coinId: ${asset.coinId}` });
-      }
+// Documentation API - Important: place these routes before the API routes
+app.use('/api/docs', swaggerUi.serve);
+app.get('/api/docs', swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    swaggerOptions: {
+        docExpansion: 'list',
+        filter: true,
+        showRequestDuration: true,
     }
+}));
 
-    for (const asset of assets) {
-      await Asset.findOneAndUpdate(
-        { userId, coinId: asset.coinId },
-        { amount: asset.amount },
-        { upsert: true, new: true }
-      );
-    }
+// Routes API
+app.use('/api', router);
 
-    res.json({ message: 'Portfolio updated successfully' });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
+// Database connection
+mongoClient();
+
+// Error handling middleware
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something broke!', message: err.message });
 });
 
-app.get('/assets', authMiddleware, async (req, res) => {
-  const userId = (req as any).user.userId;
+// Start the coin data update process
+updateCoinData();
 
-  try {
-    let assets = await Asset.find({ userId });
-
-    res.json(assets);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
+// Add listen port
+app.listen(envConfig.port, () => {
+    console.log(`Server is running on port ${envConfig.port}`);
+    console.log(`API Documentation available at http://localhost:${envConfig.port}/api/docs`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+export default app;
