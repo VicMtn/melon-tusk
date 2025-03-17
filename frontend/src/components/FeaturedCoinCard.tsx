@@ -1,25 +1,10 @@
 import React from 'react';
 import { CoinCard } from './CoinCard';
 import CryptoActionButton from './CryptoActionButton';
-
-interface CoinData {
-  name: string;
-  code: string;
-  png64: string;
-  rate: number;
-  rank: number;
-  delta: {
-    hour: number;
-    day: number;
-    week: number;
-    month: number;
-    quarter: number;
-    year: number;
-  };
-}
+import { CryptoData } from '../types/crypto';
 
 interface FeaturedCoinCardProps {
-  coin: CoinData;
+  coin: CryptoData;
   onBuy?: () => void;
 }
 
