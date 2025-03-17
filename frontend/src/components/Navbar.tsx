@@ -1,40 +1,6 @@
-import React, { useState } from 'react';
 import logo from '../assets/images/logo.png';
-import AuthModal from './AuthModal';
 
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState<string>();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      // TODO: Implement actual authentication logic here
-      console.log('Logging in with:', { email, password });
-      setIsLoggedIn(true);
-      setUserEmail(email);
-    } catch (err) {
-      console.error('Login error:', err);
-      throw new Error('Invalid credentials');
-    }
-  };
-
-  const handleRegister = async (email: string, password: string, name: string) => {
-    try {
-      // TODO: Implement actual registration logic here
-      console.log('Registering with:', { email, password, name });
-      setIsLoggedIn(true);
-      setUserEmail(email);
-    } catch (err) {
-      console.error('Registration error:', err);
-      throw new Error('Registration failed');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserEmail(undefined);
-  };
 
   return (
     <>
@@ -49,67 +15,49 @@ const Navbar = () => {
           </a>
         </div>
         <div className="navbar-end flex items-center gap-4">
-          {isLoggedIn ? (
-            <div className="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-              <button 
-                id="dropdown-scrollable" 
-                type="button" 
-                className="dropdown-toggle flex items-center focus:outline-gray-800 focus:outline-rounded" 
-                aria-haspopup="menu" 
-                aria-expanded="false" 
-                aria-label="Dropdown"
-              >
-                <div className="avatar">
-                  <div className="size-9.5 rounded-full bg-primary text-white flex items-center justify-center">
-                    <span className="text-lg font-medium">{userEmail?.[0].toUpperCase()}</span>
-                  </div>
+          <div className="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+            <button id="dropdown-scrollable" type="button" className="dropdown-toggle flex items-center" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
+              <div className="avatar">
+                <div className="w-10 rounded-full">
+                <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
+                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
                 </div>
-              </button>
-              <ul className="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-avatar">
-                <li className="dropdown-header gap-2">
-                  <div className="avatar">
-                    <div className="w-10 rounded-full bg-primary text-white flex items-center justify-center">
-                      <span className="text-lg font-medium">{userEmail?.[0].toUpperCase()}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h6 className="text-base-content text-base font-semibold">{userEmail}</h6>
-                    <small className="text-base-content/50">User</small>
-                  </div>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/settings">
-                    <span className="icon-[tabler--settings] size-5"></span>
-                    Settings
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/faq">
-                    <span className="icon-[tabler--question-mark] size-5"></span>
-                    FAQs
-                  </a>
-                </li>
-                <li className="dropdown-footer gap-2">
-                  <button 
-                    className="btn btn-error btn-soft btn-block"
-                    onClick={handleLogout}
-                  >
-                    <span className="icon-[tabler--logout] size-5"></span>
-                    Sign out
-                  </button>
-                </li>
-              </ul>
+              </div>
+      </button>
+      <ul className="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-avatar">
+        <li className="dropdown-header gap-2">
+          <div className="avatar">
+            <div className="w-10 rounded-full">
+            <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
+                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
             </div>
-          ) : (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="btn btn-primary"
-            >
-              <span className="icon-[tabler--login] size-5 mr-2"></span>
-              Login
-            </button>
-          )}
-        </div>
+          </div>
+          <div>
+            <h6 className="text-base-content text-base font-semibold">Jean Charles</h6>
+          </div>
+        </li>
+        <li>
+          <a className="dropdown-item" href="/settings">
+            <span className="icon-[tabler--settings]"></span>
+            Settings
+          </a>
+        </li>
+
+        <li>
+          <a className="dropdown-item" href="/faqs">
+            <span className="icon-[tabler--help-triangle]"></span>
+            FAQs
+          </a>
+        </li>
+        <li className="dropdown-footer gap-2">
+          <a className="btn btn-error btn-soft btn-block" href="/logout">
+            <span className="icon-[tabler--logout]"></span>
+            Sign out
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
       </nav>
 
       <aside id="default-sidebar" className="overlay sm:shadow-none overlay-open:translate-x-0 drawer drawer-start hidden max-w-64 sm:flex sm:translate-x-0 bottom-16 pt-16 z-[998]" role="dialog" >
@@ -148,17 +96,9 @@ const Navbar = () => {
           </ul>
         </div>
       </aside>
-
-      <AuthModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        isLoggedIn={isLoggedIn}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
-        onRegister={handleRegister}
-      />
     </>
   );
 }
 
 export default Navbar;
+
