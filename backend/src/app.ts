@@ -41,6 +41,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 
 // Start the coin data update process
 updateCoinData();
+console.log('Coin data update process started');
 
 // Add listen port
 app.listen(envConfig.port, () => {
