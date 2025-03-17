@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getWalletBalance, getAssetBalance } from '../controllers/walletController';
+import { getWalletBalance, getAssetBalance, getWallet } from '../controllers/walletController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
@@ -8,7 +8,7 @@ const router = Router();
 router.use(authMiddleware);
 
 // Routes du wallet
-router.get('/balance', getWalletBalance);
+router.get('/', getWalletBalance);
 router.get('/asset/:code', getAssetBalance);
 
 export default router; 
