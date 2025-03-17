@@ -1,13 +1,8 @@
 import React from 'react';
 import CryptoActionButton from './CryptoActionButton';
-
-// Generic type for crypto data
-export interface BaseCryptoData {
-  code?: string;
-  name?: string;
-  rate?: number;
-  png64?: string;
-}
+import { CryptoData } from '../types/crypto';
+import { Transaction } from '../types/transaction';
+import { CryptoMiddleware } from '../middleware/cryptoMiddleware';
 
 // Type for table columns
 export interface TableColumn<T> {
@@ -36,13 +31,6 @@ function CryptoTable<T>({
   searchTerm = '',
   emptyMessage = 'No data available'
 }: CryptoTableProps<T>) {
-  // Format number
-  const formatNumber = (num: number): string => {
-    return num.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -114,7 +102,7 @@ export const CellRenderers = {
     <span className="text-nowrap">#{item.rank}</span>
   ),
   
-  nameWithImage: (item: BaseCryptoData) => (
+  nameWithImage: (item: CryptoData) => (
     <div className="flex items-center gap-3">
       {item.png64 && (
         <img 
@@ -130,15 +118,16 @@ export const CellRenderers = {
     </div>
   ),
   
-  price: (item: BaseCryptoData) => (
+  price: (item: CryptoData) => (
     <span>${item.rate?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
   ),
   
   percentChange: (item: { delta: { day: number } }) => {
-    const isPositive = item.delta.day >= 0;
+    const percentage = CryptoMiddleware.deltaToPercentage(item.delta.day);
+    const isPositive = percentage>= 0;
     return (
       <span className={isPositive ? 'text-green-500' : 'text-red-500'}>
-        {isPositive ? '+' : ''}{item.delta.day.toFixed(2)}%
+        {isPositive ? '+' : ''}{percentage.toFixed(2)}%
       </span>
     );
   },
@@ -156,6 +145,70 @@ export const CellRenderers = {
       <CryptoActionButton action="buy" size="sm" />
       <CryptoActionButton action="sell" size="sm" />
     </div>
+  ),
+
+  // Renderers pour l'historique des transactions
+  transactionDate: (transaction: Transaction) => (
+    <span className="text-gray-600">
+      {new Date(transaction.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}
+    </span>
+  ),
+
+  transactionType: (transaction: Transaction) => {
+    const typeColors = {
+      buy: 'text-green-600',
+      sell: 'text-red-600',
+      deposit: 'text-blue-600',
+      withdraw: 'text-orange-600'
+    };
+    return (
+      <span className={`font-medium ${typeColors[transaction.type]} capitalize`}>
+        {transaction.type}
+      </span>
+    );
+  },
+
+  transactionAsset: (transaction: Transaction) => (
+    <span className="font-medium">
+      {transaction.code || 'USD'}
+    </span>
+  ),
+
+  transactionAmount: (transaction: Transaction) => (
+    <span>
+      {transaction.amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8
+      })}
+    </span>
+  ),
+
+  transactionRate: (transaction: Transaction) => (
+    transaction.rate ? (
+      <span>
+        ${transaction.rate.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}
+      </span>
+    ) : (
+      <span>-</span>
+    )
+  ),
+
+  transactionTotal: (transaction: Transaction) => (
+    <span className="font-medium">
+      ${transaction.total.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}
+    </span>
   )
 };
 
