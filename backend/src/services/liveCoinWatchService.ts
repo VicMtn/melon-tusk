@@ -1,6 +1,6 @@
 import createAxiosInstance from "./index";
 import config from "../config/envConfig";
-import { Itop50Coins, SingleCoinResponse } from "../interfaces/ICoins";
+import { ICoin, Itop50Coins, SingleCoinResponse } from "../interfaces/ICoins";
 
 const lcwApi = createAxiosInstance({
   baseURL: "https://api.livecoinwatch.com",
@@ -9,7 +9,7 @@ const lcwApi = createAxiosInstance({
   },
 });
 
-export const getCoinsTop50List = async (): Promise<Itop50Coins> => {
+export const getCoinsTop50List = async (): Promise<ICoin[]> => {
   try {
     const response = await lcwApi.post("/coins/list", {
       currency: "USD",
