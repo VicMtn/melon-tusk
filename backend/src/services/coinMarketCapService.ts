@@ -1,4 +1,4 @@
-import { IFearAndGreed } from '../interfaces/IfearAndGreed';
+import { IFearAndGreed } from '../interfaces/IFearAndGreed';
 import createAxiosInstance from './index';
 import config from '../config/envConfig';
 
