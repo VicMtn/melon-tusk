@@ -51,7 +51,7 @@ export interface CreateUserInput {
     username: string;
     email: string;
     password: string;
-    wallet: mongoose.Types.ObjectId;
+    wallet?: mongoose.Types.ObjectId;
 }
 
 export interface IPassword extends Document {
