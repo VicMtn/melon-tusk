@@ -4,16 +4,11 @@ import { Types } from 'mongoose';
 
 export const getWalletBalance = async (req: Request, res: Response) => {
     try {
-        const walletId = req.params.walletId;
-        const wallet = await Wallet.findById(walletId);
+        const user = (req as any).user;
         
-        if (!wallet) {
-            return res.status(404).json({ error: 'Wallet not found' });
-        }
-
         res.json({
-            balance: wallet.balance,
-            assets: wallet.assets
+            balance: user.wallet.balance,
+            assets: user.wallet.assets
         });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching wallet balance' });
