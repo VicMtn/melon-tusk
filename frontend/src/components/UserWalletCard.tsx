@@ -5,12 +5,11 @@ import { formatCurrency, formatPercentage } from '../utils/formatters';
 import axios, { AxiosError } from 'axios';
 
 const UserWalletCard: React.FC = () => {
-  // État pour stocker les données du portefeuille récupérées depuis MongoDB
   const [userWallet, setUserWallet] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalValue, setTotalValue] = useState(0);
-  const [change24h, setChange24h] = useState(1); // 1 = pas de changement (100%)
+  const [change24h, setChange24h] = useState(1);
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -19,16 +18,14 @@ const UserWalletCard: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Récupérer les données du portefeuille depuis MongoDB et les données du marché en parallèle
         const [walletDataFromMongo, marketDataResult] = await Promise.all([
-          walletService.getUserWallet(), // Récupère les données du portefeuille depuis MongoDB
+          walletService.getUserWallet(),
           marketService.getAllMarket()
         ]);
         
         console.log('Wallet data received:', walletDataFromMongo);
         console.log('Market data received:', marketDataResult);
         
-        // Vérifier si les données du portefeuille sont valides
         if (!walletDataFromMongo || !walletDataFromMongo.assets) {
           console.error('Invalid wallet data received:', walletDataFromMongo);
           setError('Impossible de récupérer votre portefeuille');
@@ -38,10 +35,8 @@ const UserWalletCard: React.FC = () => {
           return;
         }
         
-        // Stocker les données du portefeuille
         setUserWallet(walletDataFromMongo);
         
-        // Vérifier si les données du marché sont valides
         if (!marketDataResult || !marketDataResult.length) {
           console.error('Invalid market data received:', marketDataResult);
           setError('Impossible de récupérer les données du marché');
@@ -50,7 +45,6 @@ const UserWalletCard: React.FC = () => {
           return;
         }
         
-        // Calculer la valeur totale et la variation sur 24h en utilisant les données récupérées
         const { totalValue: calculatedTotal, change24h: calculatedChange } = 
           walletService.calculateWalletValue(walletDataFromMongo, marketDataResult);
         
@@ -59,7 +53,6 @@ const UserWalletCard: React.FC = () => {
       } catch (error: unknown) {
         console.error('Error fetching wallet data from MongoDB:', error);
         
-        // Afficher un message d'erreur plus spécifique
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;
           if (axiosError.response?.status === 404) {
@@ -84,28 +77,26 @@ const UserWalletCard: React.FC = () => {
     fetchData();
   }, [retryCount]);
 
-  // Fonction pour réessayer de récupérer les données
   const handleRetry = () => {
     setRetryCount(prev => prev + 1);
   };
 
-  // Déterminer la couleur de fond en fonction de la performance
   const getBgColorClass = () => {
-    if (error) return "bg-error/10"; // Erreur
-    if (change24h > 1.05) return "bg-success/30"; // Très bonne performance
-    if (change24h > 1) return "bg-success/20";    // Bonne performance
-    if (change24h < 0.95) return "bg-error/30";   // Mauvaise performance
-    if (change24h < 1) return "bg-error/20";      // Performance légèrement négative
-    return "bg-base-200";                         // Performance neutre
+    if (error) return "bg-error/10";
+    if (change24h > 1.05) return "bg-success/30";
+    if (change24h > 1) return "bg-success/20";
+    if (change24h > 1) return "bg-success/20";
+    if (change24h < 0.95) return "bg-error/30";
+    if (change24h < 1) return "bg-error/20";
+    return "bg-base-200";
   };
 
-  // Afficher un message si le portefeuille est vide
   const isEmptyWallet = userWallet && (!userWallet.assets || userWallet.assets.length === 0);
 
   return (
     <div className={`card glass w-full sm:w-1/3 ${getBgColorClass()}`}>
       <div className="card-body">
-        <div className="text-base-content/50 mb-3">Mon portefeuille</div>
+        <div className="text-base-content/50 mb-3">My wallet</div>
         {loading ? (
           <div className="skeleton h-10 w-3/4 mb-4"></div>
         ) : error ? (
@@ -115,27 +106,27 @@ const UserWalletCard: React.FC = () => {
               className="btn btn-sm btn-outline" 
               onClick={handleRetry}
             >
-              Réessayer
+              Error during wallet recovery
             </button>
           </div>
         ) : isEmptyWallet ? (
-          <div className="text-base mb-4">Aucun actif dans votre portefeuille</div>
+          <div className="text-base mb-4">No assets in your wallet</div>
         ) : (
           <>
             <div className="text-4xl mb-2">{formatCurrency(totalValue)}</div>
             <div className={`text-sm mb-4 ${change24h >= 1 ? 'text-success' : 'text-error'}`}>
-              {formatPercentage(change24h)} sur 24h
+              {formatPercentage(change24h)} on 24h
             </div>
             {userWallet && (
               <div className="text-xs text-base-content/50 mb-2">
-                {userWallet.assets.length} actifs dans votre portefeuille
+                {userWallet.assets.length} assets in your wallet
               </div>
             )}
           </>
         )}
         <div className="card-actions">
           <a href="/assets" className="link link-primary no-underline">
-            Voir mon portefeuille
+            See my wallet
           </a>
         </div>
       </div>
