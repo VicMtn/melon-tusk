@@ -16,7 +16,7 @@ const validateAmount = (amount: number, res: Response): boolean => {
 
 const createTransaction = async (data: CreateTransactionInput, res: Response) => {
     try {
-        const transaction = await Transaction.createTransaction(data);
+        const transaction = await Transaction.logTransaction(data);
         res.status(201).json(transaction);
     } catch (error: any) {
         if (error.message.includes('Insufficient') || error.message.includes('Invalid')) {
@@ -32,6 +32,11 @@ export const deposit = async (req: AuthRequest, res: Response) => {
     const { id: userId, wallet: walletId } = req.user;
 
     if (!validateAmount(amount, res)) return;
+    const wallet = await Wallet.findById(walletId);
+    if (!wallet) {
+        return res.status(404).json({ error: 'Wallet not found' });
+    }
+    Wallet.deposit(wallet.id, amount);
 
     await createTransaction({
         userId: new Types.ObjectId(userId),
@@ -48,6 +53,18 @@ export const withdraw = async (req: AuthRequest, res: Response) => {
     const { id: userId, wallet: walletId } = req.user;
 
     if (!validateAmount(amount, res)) return;
+    const wallet = await Wallet.findById(walletId);
+    if (!wallet) {
+        return res.status(404).json({ error: 'Wallet not found' });
+    }
+    if (wallet.balance < amount) {
+        return res.status(400).json({ 
+            error: 'Insufficient funds',
+            required: amount,
+            available: wallet.balance
+        });
+    }
+    Wallet.withdraw(wallet.id, amount);
 
     await createTransaction({
         userId: new Types.ObjectId(userId),
@@ -84,6 +101,8 @@ export const buyCrypto = async (req: AuthRequest, res: Response) => {
             });
         }
 
+        Wallet.buyAsset(wallet.id, code, amount, rate);
+        
         await createTransaction({
             userId: new Types.ObjectId(userId),
             walletId: new Types.ObjectId(walletId),
@@ -124,6 +143,8 @@ export const sellCrypto = async (req: AuthRequest, res: Response) => {
                 available: assetAmount
             });
         }
+
+        Wallet.sellAsset(wallet.id, code, amount, rate);
 
         await createTransaction({
             userId: new Types.ObjectId(userId),
