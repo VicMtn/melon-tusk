@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import Wallet from '../models/Wallet';
-import { Types } from 'mongoose';
 
 export const getWalletBalance = async (req: Request, res: Response) => {
     try {
@@ -17,7 +15,7 @@ export const getWalletBalance = async (req: Request, res: Response) => {
 
 export const getAssetBalance = async (req: Request, res: Response) => {
     try {
-        const { walletId, code } = req.params;
+        const { code } = req.params;
         const wallet = (req as any).user.wallet;
         
         if (!wallet) {
