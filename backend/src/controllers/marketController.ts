@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 import { getFearAndGreedIndex } from '../services/coinMarketCapService';
 import { getCoinsTop50List, getCoinByCode } from '../services/liveCoinWatchService';
 import { getLatestArticles } from '../services/CoinDeskService';
-import Coin from '../models/Coin';
 import envConfig from '../config/envConfig';
+import Wallet from '../models/Wallet';
 
 export const getMarketFearAndGreed = async (req: Request, res: Response) => {
     try {
@@ -11,35 +11,6 @@ export const getMarketFearAndGreed = async (req: Request, res: Response) => {
         res.json(fearAndGreedIndex);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch fear and greed index' });
-    }
-};
-
-export const getTop50Coins = async (req: Request, res: Response) => {
-    try {
-        const coinsList = await getCoinsTop50List();
-        res.json(coinsList);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch top 50 coins' });
-    }
-};
-
-export const getCoin = async (req: Request, res: Response) => {
-    try {
-        const coinCode = req.params.code;
-        if (!coinCode) {
-            return res.status(400).json({ error: 'Coin code is required' });
-        }
-
-        const coinData = await getCoinByCode(coinCode);
-        res.json(coinData);
-    } catch (error: any) {
-        if (error.message === 'Coin not found') {
-            return res.status(404).json({ error: `Coin ${req.params.code} not found` });
-        }
-        if (error.response?.status === 400) {
-            return res.status(400).json({ error: 'Invalid coin code' });
-        }
-        res.status(500).json({ error: `Failed to fetch data for coin ${req.params.code}` });
     }
 };
 
@@ -52,27 +23,43 @@ export const getNews = async (req: Request, res: Response) => {
     }
 };
 
-export const startPeriodicCoinUpdate = () => {
-    const updateCoins = async () => {
-        try {
-            const coinsData = await getCoinsTop50List();
-            if (!Array.isArray(coinsData)) {
-                console.error('Invalid response format. Expected an array of coins but got:', typeof coinsData);
-                return;
-            }
-            await Coin.bulkInsertTop50List(coinsData);
-            console.log('Periodic coin update completed successfully');
-        } catch (error) {
-            console.error('Error during periodic coin update:', error);
-            if (error instanceof Error) {
-                console.error('Error details:', error.message);
-            }
+
+const fetchCoinData = async (code: string) => {
+    try {
+        const coinCode = code.toUpperCase();
+        if (!coinCode) {
+            throw new Error('Coin code is required');
         }
-    };
 
-    updateCoins();
+        const coinData = await getCoinByCode(coinCode);
+        return coinData;
+    } catch (error: any) {
+        if (error.message === 'Coin not found') {
+            throw { status: 404, message: `Coin ${code} not found` };
+        }
+        if (error.response?.status === 400) {
+            throw { status: 400, message: 'Invalid coin code' };
+        }
+        throw { status: 500, message: `Failed to fetch data for coin ${code}` };
+    }
+};
 
-    const interval = envConfig.lcwInterval;
-    setInterval(updateCoins, interval);
-    console.log(`Periodic coin update scheduled every ${interval/1000} seconds`);
-}; 
+
+export const getAllCoins = async (req: Request, res: Response) => {
+    try {
+
+        const user = (req as any).user;
+        let coins = await getCoinsTop50List();
+        const userCoinsCodes = user.wallet.assets.map((coin: any) => coin.code);
+        const missingCoins = userCoinsCodes.filter((code: string) => !coins.find((coin: any) => coin.code === code));
+
+        if (missingCoins.length > 0) {
+            const missingCoinsData = await Promise.all(missingCoins.map(fetchCoinData));
+            coins = coins.concat(missingCoinsData);
+        }
+
+        res.json(coins);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch top 50 coins' });
+    }
+};
