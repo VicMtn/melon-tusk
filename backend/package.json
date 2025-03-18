@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec tsx src/app.ts",
+    "start": "nodemon --exec tsx src/app.ts",
+    "seed": "tsx src/seeders/seed.ts",
     "prod:build": "tsup src/app.ts --format esm --out-dir dist",
     "prod:start": "node dist/app.js"
   },
