@@ -63,3 +63,13 @@ export const getAllCoins = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Failed to fetch top 50 coins' });
     }
 };
+
+export const getACoin = async (req: Request, res: Response) => {
+    try {
+        const code = req.params.code;
+        const coinData = await fetchCoinData(code);
+        res.json(coinData);
+    } catch (error: any) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+};

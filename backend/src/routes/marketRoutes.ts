@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { 
     getMarketFearAndGreed,
     getNews,
-    getAllCoins
+    getAllCoins,
+    getACoin
 } from '../controllers/marketController';
 import { authMiddleware } from '../middleware/authMiddleware';
 
@@ -12,6 +13,7 @@ router.use(authMiddleware);
 // Routes du marché
 router.get('/fear-and-greed', getMarketFearAndGreed);
 router.get('/coins', getAllCoins)
+router.get('/coins/:code', getACoin)
 router.get('/articles', getNews);
 
 export default router;
