@@ -24,7 +24,6 @@ export interface MarketResponse {
  */
 class MarketService {
   constructor() {
-    // Initialize any other necessary properties
   }
 
   /**
@@ -33,7 +32,6 @@ class MarketService {
   async getAllMarket(): Promise<MarketData[]> {
     try {
       const response = await api.get<MarketData[]>('/market/coins-top50');
-      // Utiliser le middleware pour transformer les données
       return CryptoMiddleware.transformCoins(response.data);
     } catch (error) {
       console.error('Error fetching market data:', error);
