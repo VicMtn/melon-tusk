@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import walletService, { WalletData } from '../services/walletService';
+import walletService from '../services/walletService';
 import marketService from '../services/marketService';
 import { formatCurrency, formatPercentage } from '../utils/formatters';
 import axios, { AxiosError } from 'axios';
+import { WalletData } from '../types/wallet';
 
 const UserWalletCard: React.FC = () => {
   const [userWallet, setUserWallet] = useState<WalletData | null>(null);

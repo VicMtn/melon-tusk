@@ -1,14 +1,9 @@
-
 export interface WalletAsset {
-    coinId: string;
+    code: string;
     amount: number;
-  }
-  
-  export interface WalletData {
-    _id: string;
-    userId: string;
+}
+
+export interface WalletData {
     balance: number;
     assets: WalletAsset[];
-    createdAt: Date;
-    updatedAt: Date;
-  }
+}
