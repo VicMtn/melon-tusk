@@ -18,25 +18,11 @@ class WalletService {
         return response.data.data;
       }
       
-      return this.getEmptyWallet();
+      throw new Error('No wallet data received');
     } catch (error) {
       console.error('Error fetching user wallet:', error);
-      return this.getEmptyWallet();
+      throw error;
     }
-  }
-
-  /**
-   * Crée un portefeuille vide
-   */
-  private getEmptyWallet(): WalletData {
-    return {
-      _id: '',
-      userId: '',
-      balance: 0,
-      assets: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
   }
 
   /**
