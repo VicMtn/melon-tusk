@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getFearAndGreedIndex } from '../services/coinMarketCapService';
 import { getCoinsTop50List, getCoinByCode } from '../services/liveCoinWatchService';
-import { getLatestArticles } from '../services/coinDeskService';
+import { getLatestArticles } from '../services/CoinDeskService';
 import Coin from '../models/Coin';
 import envConfig from '../config/envConfig';
 
