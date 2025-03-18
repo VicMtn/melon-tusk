@@ -1,17 +1,34 @@
 import { Request, Response } from 'express';
+import { fetchCoinData } from './marketController';
 
 export const getWalletBalance = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
+        const wallet = user.wallet;
+
+        const assets = await Promise.all(
+            wallet.assets.map(async (asset: any) => {
+                const assetData = await fetchCoinData(asset.code);
+                return {
+                    code: asset.code,
+                    amount: asset.amount,
+                    currentValue: assetData.rate * asset.amount,
+                    rate: assetData.rate,
+                };
+            })
+        );
 
         res.json({
-            balance: user.wallet.balance,
-            assets: user.wallet.assets
+            _id: wallet._id,
+            userId: user._id,
+            balance: wallet.balance,
+            assets,
         });
     } catch (error) {
         res.status(500).json({ error: 'Error fetching wallet balance' });
     }
 };
+
 
 export const getAssetBalance = async (req: Request, res: Response) => {
     try {

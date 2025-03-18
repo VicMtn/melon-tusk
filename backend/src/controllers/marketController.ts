@@ -24,7 +24,7 @@ export const getNews = async (req: Request, res: Response) => {
 };
 
 
-const fetchCoinData = async (code: string) => {
+export const fetchCoinData = async (code: string) => {
     try {
         const coinCode = code.toUpperCase();
         if (!coinCode) {
