@@ -1,6 +1,6 @@
 import createAxiosInstance from "./index";
 import config from "../config/envConfig";
-import { ICoin, Itop50Coins, SingleCoinResponse } from "../interfaces/ICoins";
+import { ICoin, Itop50Coins, SingleCoinResponse } from "../interfaces/ICoin";
 
 const lcwApi = createAxiosInstance({
   baseURL: "https://api.livecoinwatch.com",

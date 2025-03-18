@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { ICoin, CoinModel } from '../interfaces/ICoins';
+import { ICoin, CoinModel } from '../interfaces/ICoin';
 
 const coinSchema = new Schema({
     name: { 
