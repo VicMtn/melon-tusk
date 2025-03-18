@@ -1,6 +1,7 @@
 import api from './api.ts';
 import { LoginCredentials, RegisterData, AuthResponse } from '../types/user.ts';
 import { User } from '../types/user.ts';
+import { AxiosError } from 'axios';
 
 class UserService {
   private token: string | null = null;
@@ -21,11 +22,11 @@ class UserService {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
       this.setAuthData(response.data);
       return response.data.user;
-    } catch (error: any) {
-      if (error.response?.data?.error) {
+    } catch (error: unknown) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         throw new Error(error.response.data.error);
       }
-      if (error.response?.status === 401) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
         throw new Error('Invalid email or password');
       }
       throw new Error('An error occurred during login');
@@ -40,8 +41,8 @@ class UserService {
       const response = await api.post<AuthResponse>('/auth/register', data);
       this.setAuthData(response.data);
       return response.data.user;
-    } catch (error: any) {
-      if (error.response?.data?.error) {
+    } catch (error: unknown) {
+      if (error instanceof AxiosError && error.response?.data?.error) {
         throw new Error(error.response.data.error);
       }
       throw error;
@@ -55,30 +56,9 @@ class UserService {
     this.token = null;
     this.currentUser = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userData');
     delete api.defaults.headers.common['Authorization'];
-  }
-
-
-  /**
-   * Récupérer les informations de l'utilisateur connecté
-   */
-  async getCurrentUser(): Promise<User> {
-    if (!this.isAuthenticated() && !localStorage.getItem('userId')) {
-      throw new Error('User not authenticated');
-    }
-    
-    try {
-      const response = await api.get<User>('/auth/me');
-      this.currentUser = response.data;
-      return this.currentUser;
-    } catch (error: any) {
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        this.logout();
-        throw new Error('Session expired');
-      }
-      
-      throw error;
-    }
   }
 
   /**
@@ -91,6 +71,7 @@ class UserService {
 
     const response = await api.put<User>('/users/me', data);
     this.currentUser = response.data;
+    localStorage.setItem('userData', JSON.stringify(response.data));
     return this.currentUser;
   }
 
@@ -131,6 +112,7 @@ class UserService {
     this.currentUser = authData.user;
     localStorage.setItem('token', authData.token);
     localStorage.setItem('userId', authData.user.id);
+    localStorage.setItem('userData', JSON.stringify(authData.user));
     api.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
   }
 }
