@@ -121,8 +121,15 @@ async function seed() {
     for (const userData of users) {
       const { transactions, assets, initialBalance, ...userInput } = userData;
       
-      // Créer le wallet d'abord
+      // Créer l'utilisateur d'abord
+      const user = await User.createUser({
+        ...userInput,
+        wallet: new Types.ObjectId() // Créer un nouvel ObjectId pour le wallet
+      });
+
+      // Créer le wallet avec la référence à l'utilisateur
       const wallet = await Wallet.create({
+        userId: user._id, // Ajouter la référence à l'utilisateur
         balance: initialBalance,
         assets: assets.map(asset => ({
           code: asset.code,
@@ -130,11 +137,8 @@ async function seed() {
         }))
       });
 
-      // Créer l'utilisateur avec le wallet
-      const user = await User.createUser({
-        ...userInput,
-        wallet: wallet._id as Types.ObjectId
-      });
+      // Mettre à jour l'utilisateur avec l'ID du wallet
+      await User.findByIdAndUpdate(user._id, { wallet: wallet._id });
 
       // Créer les transactions
       await Transaction.insertMany(
