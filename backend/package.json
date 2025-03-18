@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "nodemon --exec tsx src/app.ts",
-    "build": "tsc",
-    "serve": "node dist/app.js",
-    "seed": "tsx src/seeders/seed.ts"
+    "dev": "nodemon --exec tsx src/app.ts",
+    "prod:build": "tsup src/app.ts --format esm --out-dir dist",
+    "prod:start": "node dist/app.js"
   },
   "dependencies": {
     "@types/swagger-jsdoc": "^6.0.4",
@@ -32,6 +31,7 @@
     "@types/yamljs": "^0.2.34",
     "nodemon": "^3.0.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "typescript": "^5.3.3"
   }

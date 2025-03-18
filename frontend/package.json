@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prod:build": "vite build",
+    "prod:start": "vite preview"
   },
   "dependencies": {
     "@types/chart.js": "^2.9.41",
