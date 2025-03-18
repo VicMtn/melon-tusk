@@ -27,17 +27,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const isAuth = userService.isAuthenticated();
       
       if (isAuth) {
-        try {
-          const userData = await userService.getCurrentUser();
+        const userDataStr = localStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
           setUser(userData);
+          
           // Rediriger vers la page d'accueil si l'utilisateur est déjà connecté
           if (window.location.pathname === '/') {
             navigate('/homepage');
           }
-        } catch {
+        } else {
           userService.logout();
           setUser(null);
-          // Rediriger vers la page de login si l'authentification échoue
           if (window.location.pathname !== '/') {
             navigate('/');
           }
