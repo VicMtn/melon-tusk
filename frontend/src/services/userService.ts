@@ -47,7 +47,6 @@ class UserService {
     }
   }
 
-  // ===== Méthodes d'authentification =====
 
   /**
    * Connecter un utilisateur
@@ -94,13 +93,12 @@ class UserService {
     delete api.defaults.headers.common['Authorization'];
   }
 
-  // ===== Méthodes de gestion du profil =====
 
   /**
    * Récupérer les informations de l'utilisateur connecté
    */
   async getCurrentUser(): Promise<User> {
-    if (!this.isAuthenticated()) {
+    if (!this.isAuthenticated() && !localStorage.getItem('userId')) {
       throw new Error('User not authenticated');
     }
     
@@ -145,7 +143,6 @@ class UserService {
     });
   }
 
-  // ===== Méthodes utilitaires =====
 
   /**
    * Vérifier si l'utilisateur est authentifié
@@ -168,10 +165,9 @@ class UserService {
     this.token = authData.token;
     this.currentUser = authData.user;
     localStorage.setItem('token', authData.token);
-    // Configurer le token dans les headers par défaut
+    localStorage.setItem('userId', authData.user.id);
     api.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
   }
 }
 
-// Exporter une instance unique du service
 export default new UserService(); 
