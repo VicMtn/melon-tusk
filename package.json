@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+  "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+  "prod:build": "npm run prod:build --prefix backend && npm run prod:build --prefix frontend",
+  "prod:start": "concurrently \"npm run prod:start --prefix backend\" \"npm run prod:start --prefix frontend\"",
+  "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+}
+
+}
