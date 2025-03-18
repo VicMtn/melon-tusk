@@ -3,6 +3,7 @@ import config from '../config/envConfig';
 import { IArticlesResponse } from '../interfaces/IArticles';
 
 const coindeskApi = createAxiosInstance({
+  
   baseURL: 'https://data-api.coindesk.com',
   apiKeys: {
     'x-api-key': config.coindesk_api_key
