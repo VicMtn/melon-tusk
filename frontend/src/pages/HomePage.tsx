@@ -86,20 +86,20 @@ const HomePage: React.FC = () => {
         <div className="text-xl font-medium">Dashboard</div>
         <div className="divider m-0 h-1"></div>
 
-        {/* Section du portefeuille utilisateur */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+
+        <div className="flex flex-col sm:flex-row gap-4">
           <UserWalletCard />
         </div>
         <div className="divider m-0 h-1"></div>
-        <div className="text-xl font-medium">Market</div>
+        
 
-
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="w-full sm:w-2/3">
+        <div className="flex flex-col gap-4">
+          <div className="text-2xl font-semibold">Market</div>
+          <div className="w-full">
             {marketLoading ? (
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="skeleton w-full h-48"></div>
+                  <div key={i} className="skeleton h-48 w-full"></div>
                 ))}
               </div>
             ) : (
@@ -114,11 +114,12 @@ const HomePage: React.FC = () => {
                   else title = `Rank #${coin.rank}`;
                   
                   return (
-                    <CoinCard 
-                      key={coin.code} 
-                      title={title}
-                      coin={coinData}
-                    />
+                    <div key={coin.code} className="w-full">
+                      <CoinCard 
+                        title={title}
+                        coin={coinData}
+                      />
+                    </div>
                   );
                 })}
               </div>
