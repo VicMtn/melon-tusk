@@ -16,6 +16,9 @@ export const register = async (req: Request, res: Response) => {
         if (!validatePassword(password)) {
             return res.status(400).json({ error: 'Password must be at least 8 characters long and contain both letters and numbers' });
         }
+        if (await User.exists({ $or: [{ username }, { email }] })) {
+            return res.status(409).json({ error: 'Username or email already exists' });
+        }
 
         // Créer un wallet temporaire (à remplacer par votre logique de création de wallet)
         const tempWalletId = new Types.ObjectId();
