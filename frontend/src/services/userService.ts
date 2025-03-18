@@ -1,52 +1,17 @@
 import api from './api.ts';
+import { LoginCredentials, RegisterData, AuthResponse } from '../types/user.ts';
+import { User } from '../types/user.ts';
 
-// Types pour les données utilisateur
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  wallet?: {
-    balance: number;
-    assets: Array<{
-      code: string;
-      amount: number;
-    }>;
-  };
-}
-
-// Types pour l'authentification
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: User;
-}
-
-/**
- * Service de gestion des utilisateurs et de l'authentification
- */
 class UserService {
   private token: string | null = null;
   private currentUser: User | null = null;
 
   constructor() {
-    // Récupérer le token stocké au démarrage
     this.token = localStorage.getItem('token');
     if (this.token) {
-      // Configurer le token dans les headers par défaut
       api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
     }
   }
-
 
   /**
    * Connecter un utilisateur
