@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
 import { fetchCoinData } from './marketController';
+import { getTransactionHistorybyCode } from './transactionController';
+import { IUser } from '../interfaces/IUser';
+import { ITransaction } from '../interfaces/ITransaction';
 
 export const getWalletBalance = async (req: Request, res: Response) => {
     try {
@@ -9,11 +12,13 @@ export const getWalletBalance = async (req: Request, res: Response) => {
         const assets = await Promise.all(
             wallet.assets.map(async (asset: any) => {
                 const assetData = await fetchCoinData(asset.code);
+                const profitLoss = await getProfitLossOnCoin(user, asset.code, assetData.rate);
                 return {
                     code: asset.code,
                     amount: asset.amount,
                     currentValue: assetData.rate * asset.amount,
                     rate: assetData.rate,
+                    profitLoss: profitLoss
                 };
             })
         );
@@ -49,3 +54,21 @@ export const getAssetBalance = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error fetching asset balance' });
     }
 }; 
+
+const getProfitLossOnCoin = async (user: IUser, code: string, currentRate: number) => {
+    const transactions = await getTransactionHistorybyCode(user, code);
+    let profitLoss = 0;
+    transactions.forEach((transaction: ITransaction) => {
+        profitLoss += getTransactionProfitLoss(transaction, currentRate);
+    });
+    return profitLoss;
+}
+
+const getTransactionProfitLoss = (transaction: ITransaction, currentRate: number) => {
+    if (transaction.type === 'buy') {
+        return (currentRate - transaction.rate!) * transaction.amount;
+    } else if (transaction.type === 'sell') {
+        return (transaction.rate! - currentRate) * transaction.amount;
+    }
+    return 0;
+};
