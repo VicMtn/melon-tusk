@@ -176,3 +176,17 @@ export const getTransactionHistory = async (req: AuthRequest, res: Response) => 
         res.status(500).json({ error: 'Error fetching transaction history' });
     }
 };
+
+export const getTransactionHistorybyCode = async (user: any, code: string) => {
+    try {
+        const userId = user.id;
+        const coinCode = code;
+
+        const transactions = await Transaction.findByUserIdAndCode(userId, coinCode);
+
+        return transactions;
+    } catch (error) {
+        console.error('Error fetching transaction history:', error);
+        return [];
+    }
+}
