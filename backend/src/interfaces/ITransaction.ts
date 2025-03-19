@@ -31,4 +31,5 @@ export interface TransactionModel extends Model<ITransaction> {
   findByUserIdAndType(userId: string, type: TransactionType): Promise<ITransaction[]>;
   findByWalletId(walletId: string): Promise<ITransaction[]>;
   logTransaction(data: CreateTransactionInput): Promise<ITransaction>;
+  findByUserIdAndCode(userId: string, code: string): Promise<ITransaction[]>;
 }
