@@ -41,7 +41,6 @@ export const getCoinByCode = async (
       throw new Error("Coin not found");
     }
 
-    console.log("Coin data received:", response.data);
     return response.data;
   } catch (error: any) {
     console.error(
