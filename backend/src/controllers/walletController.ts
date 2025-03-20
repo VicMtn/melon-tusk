@@ -3,6 +3,7 @@ import { fetchCoinData } from './marketController';
 import { getTransactionHistorybyCode } from './transactionController';
 import { IUser } from '../interfaces/IUser';
 import { ITransaction } from '../interfaces/ITransaction';
+import { get } from 'http';
 
 export const getWalletBalance = async (req: Request, res: Response) => {
     try {
@@ -12,13 +13,15 @@ export const getWalletBalance = async (req: Request, res: Response) => {
         const assets = await Promise.all(
             wallet.assets.map(async (asset: any) => {
                 const assetData = await fetchCoinData(asset.code);
-                const profitLoss = await getProfitLossOnCoin(user, asset.code, assetData.rate);
+                const currentValue = assetData.rate * asset.amount;
+                const profitLoss = currentValue - getTotalInvestment(await getTransactionHistorybyCode(user, asset.code));
                 return {
                     code: asset.code,
                     amount: asset.amount,
-                    currentValue: assetData.rate * asset.amount,
+                    currentValue: currentValue,
                     rate: assetData.rate,
-                    profitLoss: profitLoss
+                    profitLoss: profitLoss,
+                    profitLossPercentage: (profitLoss / getTotalInvestment(await getTransactionHistorybyCode(user, asset.code))) * 100
                 };
             })
         );
@@ -55,20 +58,13 @@ export const getAssetBalance = async (req: Request, res: Response) => {
     }
 }; 
 
-const getProfitLossOnCoin = async (user: IUser, code: string, currentRate: number) => {
-    const transactions = await getTransactionHistorybyCode(user, code);
-    let profitLoss = 0;
-    transactions.forEach((transaction: ITransaction) => {
-        profitLoss += getTransactionProfitLoss(transaction, currentRate);
-    });
-    return profitLoss;
+const getTotalInvestment = (transactions: ITransaction[]) => {
+    return transactions.reduce((total, transaction) => {
+        if (transaction.type === 'buy') {
+            return total + transaction.amount * transaction.rate!;
+        } else if (transaction.type === 'sell') {
+            return total - transaction.amount * transaction.rate!;
+        }
+        return total;
+    }, 0);
 }
-
-const getTransactionProfitLoss = (transaction: ITransaction, currentRate: number) => {
-    if (transaction.type === 'buy') {
-        return (currentRate - transaction.rate!) * transaction.amount;
-    } else if (transaction.type === 'sell') {
-        return (transaction.rate! - currentRate) * transaction.amount;
-    }
-    return 0;
-};
