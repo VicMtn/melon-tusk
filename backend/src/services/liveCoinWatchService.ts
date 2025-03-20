@@ -30,7 +30,6 @@ export const getCoinByCode = async (
   code: string
 ): Promise<ICoin> => {
   try {
-    console.log("Fetching coin data for:", code);
     const response = await lcwApi.post("/coins/single", {
       currency: "USD",
       code: code.toUpperCase(),
