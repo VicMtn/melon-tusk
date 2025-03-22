@@ -10,7 +10,6 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
-  updateProfile: (data: Partial<User>) => Promise<void>;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
@@ -21,7 +20,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Vérifier l'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = userService.isAuthenticated();
@@ -32,7 +30,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const userData = JSON.parse(userDataStr);
           setUser(userData);
           
-          // Rediriger vers la page d'accueil si l'utilisateur est déjà connecté
           if (window.location.pathname === '/') {
             navigate('/homepage');
           }
@@ -44,7 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         }
       } else {
-        // Rediriger vers la page de login si l'utilisateur n'est pas connecté
         if (window.location.pathname !== '/') {
           navigate('/');
         }
@@ -84,7 +80,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     login,
     register,
     logout,
-    updateProfile,
     updatePassword,
   };
 
