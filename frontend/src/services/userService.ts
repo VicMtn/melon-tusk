@@ -14,9 +14,6 @@ class UserService {
     }
   }
 
-  /**
-   * Connecter un utilisateur
-   */
   async login(credentials: LoginCredentials): Promise<User> {
     try {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
@@ -33,9 +30,6 @@ class UserService {
     }
   }
 
-  /**
-   * Inscrire un nouvel utilisateur
-   */
   async register(data: RegisterData): Promise<User> {
     try {
       const response = await api.post<AuthResponse>('/auth/register', data);
@@ -49,35 +43,22 @@ class UserService {
     }
   }
 
-  /**
-   * Déconnecter l'utilisateur
-   */
-  logout(): void {
-    this.token = null;
-    this.currentUser = null;
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('userData');
-    delete api.defaults.headers.common['Authorization'];
-  }
-
-  /**
-   * Mettre à jour le profil de l'utilisateur
-   */
-  async updateProfile(data: Partial<User>): Promise<User> {
-    if (!this.isAuthenticated()) {
-      throw new Error('User not authenticated');
+  async logout(): Promise<void> {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      this.token = null;
+      this.currentUser = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userData');
+      delete api.defaults.headers.common['Authorization'];
     }
-
-    const response = await api.put<User>('/users/me', data);
-    this.currentUser = response.data;
-    localStorage.setItem('userData', JSON.stringify(response.data));
-    return this.currentUser;
   }
 
-  /**
-   * Mettre à jour le mot de passe
-   */
+
   async updatePassword(currentPassword: string, newPassword: string): Promise<void> {
     if (!this.isAuthenticated()) {
       throw new Error('User not authenticated');
@@ -89,24 +70,13 @@ class UserService {
     });
   }
 
-
-  /**
-   * Vérifier si l'utilisateur est authentifié
-   */
   isAuthenticated(): boolean {
     return !!this.token;
   }
-
-  /**
-   * Obtenir le token actuel
-   */
   getToken(): string | null {
     return this.token;
   }
 
-  /**
-   * Définir les données d'authentification
-   */
   private setAuthData(authData: AuthResponse): void {
     this.token = authData.token;
     this.currentUser = authData.user;
