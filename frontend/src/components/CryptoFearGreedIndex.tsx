@@ -89,10 +89,25 @@ const CryptoFearGreedIndex: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="card bg-base-200 shadow-xl">
+      <div className="card glass bg-orange-200">
         <div className="card-body">
-          <div className="flex justify-center items-center h-64">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
+          <h2 className="text-base-content/50 mb-2">Crypto Fear & Greed Index</h2>
+          <div className="flex flex-col md:flex-row items-center gap-20">
+            <div className="relative w-full max-w-[200px] rounded-2xl overflow-hidden">
+              <div className="flex justify-center items-center h-[180px]">
+                <span className="loading loading-spinner loading-lg text-primary"></span>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-sm text-base-content/70">
+                Loading...
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="text-sm text-base-content/70">
+                <p>The Fear & Greed Index analyzes emotions and sentiments from different sources and represents them in a simple number. The index ranges from 0 to 100, where 0 represents "Extreme Fear" and 100 represents "Extreme Greed".</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
