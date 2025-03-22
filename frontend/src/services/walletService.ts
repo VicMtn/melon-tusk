@@ -1,6 +1,8 @@
-import { MarketData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 import { formatCurrency } from '../utils/formatters';
 import { IWallet } from '../types/wallet';
+import api from './api';
+
 
 /**
  * Service pour gérer les données du portefeuille de l'utilisateur
@@ -9,9 +11,15 @@ class WalletService {
 
   async getUserWallet(): Promise<IWallet> {
     try {
+
       const userData = localStorage.getItem('userData');
       if (!userData) {
         throw new Error('User data not found in localStorage');
+      }
+      const response = await api.get<{ data: IWallet }>('/wallet');
+
+      if (response?.data) {
+        return response.data as unknown as IWallet;
       }
 
       const { wallet } = JSON.parse(userData);
@@ -29,7 +37,7 @@ class WalletService {
   /**
    * Calcule la valeur totale du portefeuille et sa variation sur 24h
    */
-  calculateWalletValue(wallet: IWallet, marketData: MarketData[]): { totalValue: number, change24h: number } {
+  calculateWalletValue(wallet: IWallet, marketData: CoinData[]): { totalValue: number, change24h: number } {
     if (!wallet?.assets?.length || !marketData?.length) {
       return { totalValue: 0, change24h: 1 };
     }
