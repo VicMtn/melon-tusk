@@ -7,7 +7,7 @@ import marketService from '../services/marketService';
 import { MarketData } from '../types/crypto';
 import { NewsArticle } from '../types/articles';
 import { transformArticleData } from '../middleware/articleMiddleware';
-
+import CryptoFearGreedIndex from '../components/CryptoFearGreedIndex';
 const HomePage: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [coins, setCoins] = useState<MarketData[]>([]);
@@ -80,6 +80,7 @@ const HomePage: React.FC = () => {
         <div className="divider m-0 h-1"></div>
         <div className="flex flex-col sm:flex-row gap-4">
           <UserWalletCard />
+          <CryptoFearGreedIndex />
         </div>
         <div className="divider m-0 h-1"></div>
         <div className="flex flex-col gap-4">
