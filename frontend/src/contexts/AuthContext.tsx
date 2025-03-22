@@ -67,15 +67,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     navigate('/homepage');
   };
 
-  const logout = () => {
-    userService.logout();
+  const logout = async () => {
+    await userService.logout();
     setUser(null);
     navigate('/');
-  };
-
-  const updateProfile = async (data: Partial<User>) => {
-    const updatedUser = await userService.updateProfile(data);
-    setUser(updatedUser);
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
