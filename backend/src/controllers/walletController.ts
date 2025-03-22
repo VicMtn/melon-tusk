@@ -27,9 +27,9 @@ export const getWalletBalance = async (req: Request, res: Response) => {
         );
 
         res.json({
-            _id: wallet._id,
-            userId: user._id,
+            id: wallet._id,
             balance: wallet.balance,
+            totalAssetsValue: assets.reduce((total, asset) => total + asset.currentValue, 0),
             assets,
         });
     } catch (error) {
