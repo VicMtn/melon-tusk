@@ -1,9 +1,10 @@
-export interface WalletAsset {
-    code: string;
-    amount: number;
+export interface IWallet extends Document {
+    id: string;
+    balance: number;
+    assets: Asset[];
 }
 
-export interface WalletData {
-    balance: number;
-    assets: WalletAsset[];
+export interface Asset {
+    code: string;
+    amount: number;
 }
