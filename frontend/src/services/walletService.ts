@@ -1,24 +1,25 @@
-import api from './api';
 import { MarketData } from '../types/crypto';
 import { formatCurrency } from '../utils/formatters';
-import { WalletData } from '../types/wallet';
+import { IWallet } from '../types/wallet';
 
 /**
  * Service pour gérer les données du portefeuille de l'utilisateur
  */
 class WalletService {
-  /**
-   * Récupère le portefeuille de l'utilisateur connecté depuis MongoDB
-   */
-  async getUserWallet(): Promise<WalletData> {
+
+  async getUserWallet(): Promise<IWallet> {
     try {
-      const response = await api.get<{ data: WalletData }>('/wallet');
-      
-      if (response?.data?.data) {
-        return response.data.data;
+      const userData = localStorage.getItem('userData');
+      if (!userData) {
+        throw new Error('User data not found in localStorage');
       }
-      
-      throw new Error('No wallet data received');
+
+      const { wallet } = JSON.parse(userData);
+      if (!wallet) {
+        throw new Error('Wallet not found in user data');
+      }
+
+      return wallet;
     } catch (error) {
       console.error('Error fetching user wallet:', error);
       throw error;
@@ -28,7 +29,7 @@ class WalletService {
   /**
    * Calcule la valeur totale du portefeuille et sa variation sur 24h
    */
-  calculateWalletValue(wallet: WalletData, marketData: MarketData[]): { totalValue: number, change24h: number } {
+  calculateWalletValue(wallet: IWallet, marketData: MarketData[]): { totalValue: number, change24h: number } {
     if (!wallet?.assets?.length || !marketData?.length) {
       return { totalValue: 0, change24h: 1 };
     }
@@ -37,12 +38,12 @@ class WalletService {
     let totalValueYesterday = 0;
 
     wallet.assets.forEach(asset => {
-      if (!asset.coinId || typeof asset.amount !== 'number') {
+      if (!asset.code || typeof asset.amount !== 'number') {
         console.warn('Invalid asset in wallet:', asset);
         return;
       }
 
-      const coin = marketData.find(c => c.code === asset.coinId);
+      const coin = marketData.find(c => c.code === asset.code);
 
       if (coin?.rate) {
         const currentValue = asset.amount * coin.rate;
