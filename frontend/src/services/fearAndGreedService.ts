@@ -2,7 +2,7 @@ import api from './api';
 
 export interface FearAndGreedData {
   value: number;
-  classification: 'Extreme Fear' | 'Fear' | 'Neutral' | 'Greed' | 'Extreme Greed';
+  value_classification: 'Extreme Fear' | 'Fear' | 'Neutral' | 'Greed' | 'Extreme Greed';
   timestamp: string;
 }
 
