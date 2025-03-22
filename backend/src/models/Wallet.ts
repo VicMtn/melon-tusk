@@ -120,6 +120,104 @@ walletSchema.methods.getAssetAmount = function(code: string): number {
     return asset ? asset.amount : 0;
 };
 
+walletSchema.statics.buyAsset = async function(
+    id: string,
+    code: string,
+    amount: number,
+    rate: number,
+    session?: ClientSession
+): Promise<IWallet | null> {
+    if (amount <= 0 || rate <= 0) {
+        throw new Error('Amount and rate must be positive');
+    }
+
+    const wallet = await this.findById(id).session(session);
+    if (!wallet) return null;
+
+    const cost = amount * rate;
+    if (wallet.balance < cost) {
+        throw new Error('Insufficient balance to buy assets');
+    }
+
+    wallet.balance -= cost;
+
+    const assetIndex = wallet.assets.findIndex((asset: { code: string; amount: number }) => asset.code === code.toUpperCase());
+    if (assetIndex === -1) {
+        wallet.assets.push({ code: code.toUpperCase(), amount });
+    } else {
+        wallet.assets[assetIndex].amount += amount;
+    }
+
+    return wallet.save({ session });
+};
+
+walletSchema.statics.sellAsset = async function(
+    id: string,
+    code: string,
+    amount: number,
+    rate: number,
+    session?: ClientSession
+): Promise<IWallet | null> {
+    if (amount <= 0 || rate <= 0) {
+        throw new Error('Amount and rate must be positive');
+    }
+
+    const wallet = await this.findById(id).session(session);
+    if (!wallet) return null;
+
+    const assetIndex = wallet.assets.findIndex((asset: { code: string; amount: number }) => asset.code === code.toUpperCase());
+    if (assetIndex === -1 || wallet.assets[assetIndex].amount < amount) {
+        throw new Error(`Insufficient ${code} assets to sell`);
+    }
+
+    const revenue = amount * rate;
+    wallet.balance += revenue;
+    wallet.assets[assetIndex].amount -= amount;
+
+    if (wallet.assets[assetIndex].amount === 0) {
+        wallet.assets.splice(assetIndex, 1); // Remove the asset if the amount is zero
+    }
+
+    return wallet.save({ session });
+};
+
+walletSchema.statics.deposit = async function(
+    id: string,
+    amount: number,
+    session?: ClientSession
+): Promise<IWallet | null> {
+    if (amount <= 0) {
+        throw new Error('Deposit amount must be positive');
+    }
+
+    const wallet = await this.findById(id).session(session);
+    if (!wallet) return null;
+
+    wallet.balance += amount;
+
+    return wallet.save({ session });
+};
+
+walletSchema.statics.withdraw = async function(
+    id: string,
+    amount: number,
+    session?: ClientSession
+): Promise<IWallet | null> {
+    if (amount <= 0) {
+        throw new Error('Withdrawal amount must be positive');
+    }
+
+    const wallet = await this.findById(id).session(session);
+    if (!wallet) return null;
+
+    if (wallet.balance < amount) {
+        throw new Error('Insufficient balance to withdraw');
+    }
+
+    wallet.balance -= amount;
+
+    return wallet.save({ session });
+};
 // Création du modèle
 const Wallet = mongoose.model<IWallet, WalletModel>('Wallet', walletSchema);
 

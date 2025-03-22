@@ -23,9 +23,6 @@ const UserWalletCard: React.FC = () => {
           marketService.getAllMarket()
         ]);
         
-        console.log('Wallet data received:', walletDataFromMongo);
-        console.log('Market data received:', marketDataResult);
-        
         if (!walletDataFromMongo || !walletDataFromMongo.assets) {
           console.error('Invalid wallet data received:', walletDataFromMongo);
           setError('Impossible de récupérer votre portefeuille');

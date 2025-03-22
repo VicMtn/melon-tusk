@@ -1,6 +1,6 @@
 import createAxiosInstance from "./index";
 import config from "../config/envConfig";
-import { ICoin, Itop50Coins, SingleCoinResponse } from "../interfaces/ICoins";
+import { ICoin } from "../interfaces/ICoin";
 
 const lcwApi = createAxiosInstance({
   baseURL: "https://api.livecoinwatch.com",
@@ -28,9 +28,8 @@ export const getCoinsTop50List = async (): Promise<ICoin[]> => {
 
 export const getCoinByCode = async (
   code: string
-): Promise<SingleCoinResponse> => {
+): Promise<ICoin> => {
   try {
-    console.log("Fetching coin data for:", code);
     const response = await lcwApi.post("/coins/single", {
       currency: "USD",
       code: code.toUpperCase(),
@@ -41,7 +40,6 @@ export const getCoinByCode = async (
       throw new Error("Coin not found");
     }
 
-    console.log("Coin data received:", response.data);
     return response.data;
   } catch (error: any) {
     console.error(

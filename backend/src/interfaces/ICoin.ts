@@ -53,37 +53,3 @@ export interface ICoin extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
-
-export interface Itop50Coins {
-    data: ICoin[];
-}
-
-export interface CoinModel extends Model<ICoin> {
-    findBySymbol(symbol: string): Promise<ICoin | null>;
-    updateCoinData(symbol: string, data: Partial<ICoin>): Promise<ICoin | null>;
-    findTopCoins(limit?: number): Promise<ICoin[]>;
-    bulkInsertTop50List(coins: ICoin[]): Promise<void>;
-    findByCode(code: string): Promise<ICoin | null>;
-    getCoinList(): Promise<ICoin[]>;
-}
-
-export interface SingleCoinResponse {
-    code: string;
-    rate: number;
-    volume: number;
-    cap: number;
-    delta: {
-        hour: number;
-        day: number;
-        week: number;
-        month: number;
-        quarter: number;
-        year: number;
-    };
-    meta?: {
-        name: string;
-        description?: string;
-        website?: string;
-        explorer?: string;
-    };
-}
