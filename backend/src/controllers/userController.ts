@@ -78,6 +78,14 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
+export const logout = async (req: Request, res: Response) => {
+    try {
+        res.json({ message: 'Logged out successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error during logout' });
+    }
+};
+
 export const getUserByUsername = async (req: Request, res: Response) => {
     try {
         const user = await User.findByUsername(req.params.username);
