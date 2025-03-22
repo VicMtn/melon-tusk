@@ -1,4 +1,4 @@
-export interface MarketData {
+export interface CoinData {
   name: string;
   symbol?: string | null;
   rank?: number;

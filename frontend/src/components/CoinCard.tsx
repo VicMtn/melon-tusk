@@ -1,10 +1,10 @@
 import React from 'react';
 import { cleanCryptoCode, formatCurrency, formatPercentage } from '../utils/formatters';
-import { CryptoData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 
 interface CoinCardProps {
   title: string;
-  coin: CryptoData;
+  coin: CoinData;
 }
 
 const CoinCard: React.FC<CoinCardProps> = ({ title, coin }) => {

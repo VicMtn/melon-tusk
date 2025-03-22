@@ -4,13 +4,13 @@ import { ArticleCard } from '../components/ArticleCard';
 import UserWalletCard from '../components/UserWalletCard';
 import newsService from '../services/newsService';
 import marketService from '../services/marketService';
-import { MarketData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 import { NewsArticle } from '../types/articles';
 import { transformArticleData } from '../middleware/articleMiddleware';
 import CryptoFearGreedIndex from '../components/CryptoFearGreedIndex';
 const HomePage: React.FC = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [coins, setCoins] = useState<MarketData[]>([]);
+  const [coins, setCoins] = useState<CoinData[]>([]);
   const [loading, setLoading] = useState(true);
   const [marketLoading, setMarketLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +49,7 @@ const HomePage: React.FC = () => {
 
   // Fonction pour convertir MarketData en CoinData
   // Les données sont déjà nettoyées par le middleware
-  const mapToCoinData = (coin: MarketData): MarketData => coin;
+  const mapToCoinData = (coin: CoinData): CoinData => coin;
 
   // Obtenir les coins les plus importants
   const getTopCoins = () => {
