@@ -184,7 +184,6 @@ const Assets = () => {
 
   const handleTransactionSubmit = async (amount: number, total: number) => {
     // TODO: Implement actual transaction logic
-    console.log(`Transaction: ${modalType}`, { amount, total });
     // Mock success
     return Promise.resolve();
   };

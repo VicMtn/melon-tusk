@@ -3,8 +3,9 @@ import jwt from 'jsonwebtoken';
 import { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { IPassword, IUser } from '../interfaces/IUser';
+import User from '../models/User'; // Import your User model
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -16,8 +17,16 @@ export const authMiddleware = (
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    const user = await User.findById(decoded.id)
+      .select('-password')
+      .populate('wallet');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    (req as any).user = user; // Attach the user object to the request
     next();
   } catch (error) {
     res.status(400).json({ error: 'Invalid token.' });

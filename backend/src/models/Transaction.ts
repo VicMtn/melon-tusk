@@ -89,6 +89,15 @@ transactionSchema.statics.logTransaction = async function(
     return transaction.save();
 };
 
+transactionSchema.statics.findByUserIdAndCode = async function(
+    userId: string,
+    code: string
+): Promise<ITransaction[]> {
+    return this.find({ userId, code })
+        .sort({ createdAt: -1 })
+        .lean();
+}
+
 const Transaction = mongoose.model<ITransaction, TransactionModel>('Transaction', transactionSchema);
 
 export default Transaction; 

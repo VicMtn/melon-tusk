@@ -19,6 +19,10 @@ export interface WalletModel extends Model<IWallet> {
     createWallet(): Promise<IWallet>;
     findByIdAndUpdateBalance(id: string, amount: number, session?: ClientSession): Promise<IWallet | null>;
     findByIdAndUpdateAsset(id: string, code: string, amount: number, session?: ClientSession): Promise<IWallet | null>;
+    buyAsset(id: string, code: string, amount: number, rate: number, session?: ClientSession): Promise<IWallet | null>;
+    sellAsset(id: string, code: string, amount: number, rate: number, session?: ClientSession): Promise<IWallet | null>;
+    deposit(id: string, amount: number, session?: ClientSession): Promise<IWallet | null>;
+    withdraw(id: string, amount: number, session?: ClientSession): Promise<IWallet | null>;
 }
 
 export const walletSchema = new mongoose.Schema<IWallet>({
