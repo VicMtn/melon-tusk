@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
 
 const Navbar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     // Réinitialiser les composants FlyonUI
@@ -11,6 +11,11 @@ const Navbar = () => {
       window.HSStaticMethods.autoInit();
     }
   }, []);
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await logout();
+  };
 
   return (
     <>
@@ -58,10 +63,10 @@ const Navbar = () => {
           </a>
         </li>
         <li className="dropdown-footer gap-2">
-          <a className="btn btn-error btn-soft btn-block" href="/logout">
+          <button className="btn btn-error btn-soft btn-block" onClick={handleLogout}>
             <span className="icon-[tabler--logout]"></span>
             Sign out
-          </a>
+          </button>
         </li>
       </ul>
     </div>
