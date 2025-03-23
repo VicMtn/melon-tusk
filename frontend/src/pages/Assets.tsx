@@ -22,6 +22,8 @@ const Assets = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
   const [selectedCrypto, setSelectedCrypto] = useState<Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'> | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 4;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +77,7 @@ const Assets = () => {
     setIsModalOpen(true);
   };
 
-  const handleTransactionSubmit = async (amount: number, total: number) => {
+  const handleTransactionSubmit = async (amount: number) => {
     try {
       if (modalType === 'deposit' || modalType === 'withdraw') {
         await transactionService.handleWalletOperation(modalType, amount);
@@ -91,6 +93,10 @@ const Assets = () => {
       console.error('Transaction failed:', error);
       throw error;
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   const portfolioColumns: TableColumn<Asset>[] = [
@@ -226,6 +232,10 @@ const Assets = () => {
           data={walletData.assets}
           columns={portfolioColumns}
           emptyMessage="Your portfolio is empty. Start by buying some crypto!"
+          pageSize={pageSize}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+          totalItems={walletData.assets.length}
         />
       </div>
       <div>
