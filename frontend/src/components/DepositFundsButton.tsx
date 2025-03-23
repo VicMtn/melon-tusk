@@ -2,36 +2,27 @@ import React, { useState } from 'react';
 import TransactionModal from './TransactionModal';
 import transactionService from '../services/transactionService';
 import { useUser } from '../hooks/useUser';
-import { CoinData } from '../types/crypto';
-import CryptoActionButton from './CryptoActionButton';
+import FundActionButton from './FundActionButton';
 
-interface BuyCryptoButtonProps {
-  cryptoData: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
+interface DepositFundsButtonProps {
   fullWidth?: boolean;
-  size?: 'sm' | 'md' | 'lg';
   onSuccess?: () => void;
 }
 
-const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({ 
-  cryptoData, 
-  fullWidth = false,
-  size = 'sm',
-  onSuccess 
-}) => {
+const DepositFundsButton: React.FC<DepositFundsButtonProps> = ({ fullWidth = false, onSuccess }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, refreshUser } = useUser();
 
   const handleTransaction = async (amount: number) => {
-    await transactionService.buyCrypto(cryptoData.code, amount);
+    await transactionService.handleWalletOperation('deposit', amount);
     await refreshUser();
     if (onSuccess) onSuccess();
   };
 
   return (
     <>
-      <CryptoActionButton
-        action="buy"
-        size={size}
+      <FundActionButton
+        action="deposit"
         fullWidth={fullWidth}
         onClick={() => setIsModalOpen(true)}
       />
@@ -39,8 +30,7 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        type="buy"
-        cryptoData={cryptoData}
+        type="deposit"
         balance={user?.wallet?.balance || 0}
         onSubmit={handleTransaction}
       />
@@ -48,4 +38,4 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({
   );
 };
 
-export default BuyCryptoButton; 
+export default DepositFundsButton; 

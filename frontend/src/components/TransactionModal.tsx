@@ -7,7 +7,7 @@ interface TransactionModalProps {
   type: 'buy' | 'sell' | 'deposit' | 'withdraw';
   cryptoData?: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
   balance?: number;
-  onSubmit: (amount: number, total: number) => Promise<void>;
+  onSubmit: (amount: number) => Promise<void>;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -35,7 +35,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     setIsLoading(true);
 
     try {
-      await onSubmit(Number(amount), total);
+      await onSubmit(Number(amount));
       setAmount('');
       onClose();
     } catch (err) {
