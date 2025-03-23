@@ -20,7 +20,6 @@ const Navbar = () => {
               <div className="avatar">
                 <div className="w-10 rounded-full">
                 <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
-                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
                 </div>
               </div>
       </button>
@@ -29,7 +28,6 @@ const Navbar = () => {
           <div className="avatar">
             <div className="w-10 rounded-full">
             <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
-                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
             </div>
           </div>
           <div>

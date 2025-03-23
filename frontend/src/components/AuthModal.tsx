@@ -20,13 +20,12 @@ const AuthModal: React.FC<AuthModalProps> = ({
 
   const getErrorMessage = (error: unknown): string => {
     if (error instanceof Error) {
-      // Check for error response from axios
+
       const axiosError = error as any;
       if (axiosError.response?.data?.error) {
         return axiosError.response.data.error;
       }
 
-      // Messages d'erreur spécifiques pour l'authentification
       if (error.message.includes('User not found') || error.message.includes('Invalid email or password')) {
         return "Invalid email or password. Please check your credentials.";
       }
@@ -36,7 +35,6 @@ const AuthModal: React.FC<AuthModalProps> = ({
       if (error.message.includes('Password too short')) {
         return "Password must be at least 8 characters long and contain at least one number.";
       }
-      // Message par défaut si l'erreur n'est pas reconnue
       return error.message;
     }
     return "An unexpected error occurred. Please try again.";

@@ -19,7 +19,7 @@ const Settings = () => {
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe', // Default
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe',
   });
 
   const themes = [
@@ -67,7 +67,7 @@ const Settings = () => {
       alert("New passwords don't match!");
       return;
     }
-    // TODO: Add API call to save user settings
+    // TODO: Add API call to save user settings, feature might come later
     console.log('Saving user settings:', userSettings);
   };
 

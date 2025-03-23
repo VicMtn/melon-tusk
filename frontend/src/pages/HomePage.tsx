@@ -47,11 +47,10 @@ const HomePage: React.FC = () => {
     fetchMarketData();
   }, []);
 
-  // Fonction pour convertir MarketData en CoinData
-  // Les données sont déjà nettoyées par le middleware
+  // Map the coin data
   const mapToCoinData = (coin: CoinData): CoinData => coin;
 
-  // Obtenir les coins les plus importants
+  // Get the top coins
   const getTopCoins = () => {
     if (!coins || !Array.isArray(coins) || coins.length === 0) return [];
     

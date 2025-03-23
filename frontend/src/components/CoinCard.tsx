@@ -8,7 +8,7 @@ interface CoinCardProps {
 }
 
 const CoinCard: React.FC<CoinCardProps> = ({ title, coin }) => {
-  // Nettoyer le code en retirant les underscores
+  // Clean the code by removing underscores
   const cleanedCode = cleanCryptoCode(coin.code);
   
   return (

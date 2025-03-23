@@ -78,19 +78,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     }
   };
 
-  const getButtonClass = () => {
-    switch (type) {
-      case 'buy':
-        return 'btn-success';
-      case 'sell':
-        return 'btn-error';
-      case 'deposit':
-        return 'btn-primary';
-      case 'withdraw':
-        return 'btn-outline';
-    }
-  };
-
   const getTitle = () => {
     switch (type) {
       case 'buy':

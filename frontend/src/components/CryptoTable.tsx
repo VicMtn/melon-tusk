@@ -145,7 +145,7 @@ function CryptoTable<T>({
 }
 
 export const CellRenderers = {
-  // Cellule pour le rang
+  // Cell for the rank
   rank: (item: { rank: number }) => (
     <span className="text-nowrap">#{item.rank}</span>
   ),
@@ -195,7 +195,7 @@ export const CellRenderers = {
     </div>
   ),
 
-  // Renderers pour l'historique des transactions
+  // Render the transaction date
   transactionDate: (transaction: Transaction) => (
     <span className="text-gray-600">
       {new Date(transaction.createdAt || '').toLocaleDateString('en-US', {
