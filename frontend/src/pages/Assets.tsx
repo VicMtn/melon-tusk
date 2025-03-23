@@ -55,6 +55,16 @@ const Assets = () => {
     });
   };
 
+  const getMostValuableAsset = (): { code: string; value: number } | null => {
+    if (!walletData.assets || walletData.assets.length === 0) return null;
+    
+    return walletData.assets.reduce((max, asset) => {
+      return asset.currentValue > max.value ? 
+        { code: asset.code, value: asset.currentValue } : 
+        max;
+    }, { code: '', value: -1 });
+  };
+
   const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>) => {
     setModalType(type);
     if (crypto) {
@@ -158,6 +168,12 @@ const Assets = () => {
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue + walletData.balance)}</p>
           <div className="flex justify-between text-sm">
+            {getMostValuableAsset() && (
+              <div className="text-gray-600">
+                Most valuable: <span className="font-medium text-primary-600">{getMostValuableAsset()?.code}</span>
+                <span className="ml-2">${formatNumber(getMostValuableAsset()?.value || 0)}</span>
+              </div>
+            )}
           </div>
         </div>
 
