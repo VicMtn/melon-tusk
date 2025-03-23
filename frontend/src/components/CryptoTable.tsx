@@ -1,6 +1,6 @@
 import React from 'react';
 import CryptoActionButton from './CryptoActionButton';
-import { CryptoData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 import { Transaction } from '../types/transaction';
 import { CryptoMiddleware } from '../middleware/cryptoMiddleware';
 
@@ -20,6 +20,10 @@ interface CryptoTableProps<T> {
   onSearch?: (term: string) => void;
   searchTerm?: string;
   emptyMessage?: string;
+  pageSize?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  totalItems?: number;
 }
 
 function CryptoTable<T>({
@@ -29,8 +33,51 @@ function CryptoTable<T>({
   showSearch = false,
   onSearch,
   searchTerm = '',
-  emptyMessage = 'No data available'
+  emptyMessage = 'No data available',
+  pageSize,
+  currentPage = 1,
+  onPageChange,
+  totalItems
 }: CryptoTableProps<T>) {
+
+  const totalPages = pageSize && pageSize > 0 ? Math.ceil((totalItems || data.length) / pageSize) : 0;
+  const showPagination = totalPages > 1 && pageSize && pageSize > 0;
+
+  // Paginate data locally
+  const paginatedData = React.useMemo(() => {
+    if (!pageSize || pageSize <= 0) return data;
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return data.slice(start, end);
+  }, [data, currentPage, pageSize]);
+
+  const renderPagination = () => {
+    if (!showPagination) return null;
+
+    return (
+      <div className="flex justify-center items-center gap-2">
+        <button
+          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => onPageChange?.(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <span className="icon-[tabler--chevron-left] size-5"></span>
+        </button>
+        
+        <span className="text-sm text-gray-600">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => onPageChange?.(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <span className="icon-[tabler--chevron-right] size-5"></span>
+        </button>
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -71,8 +118,8 @@ function CryptoTable<T>({
               </tr>
             </thead>
             <tbody>
-              {data.length > 0 ? (
-                data.map((item, index) => (
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     {columns.map((column) => (
                       <td key={`${index}-${column.key}`} className={column.className || ''}>
@@ -92,6 +139,7 @@ function CryptoTable<T>({
           </table>
         </div>
       </div>
+      {renderPagination()}
     </div>
   );
 }
