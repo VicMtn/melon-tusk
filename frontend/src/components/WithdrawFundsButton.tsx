@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TransactionModal from './TransactionModal';
 import transactionService from '../services/transactionService';
 import { useUser } from '../hooks/useUser';
@@ -11,7 +11,19 @@ interface WithdrawFundsButtonProps {
 
 const WithdrawFundsButton: React.FC<WithdrawFundsButtonProps> = ({ fullWidth = false, onSuccess }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState(0);
   const { user, refreshUser } = useUser();
+
+  useEffect(() => {
+    if (user && user.wallet) {
+      setCurrentBalance(user.wallet.balance);
+    }
+  }, [user, isModalOpen]);
+
+  const handleOpenModal = async () => {
+    await refreshUser();
+    setIsModalOpen(true);
+  };
 
   const handleTransaction = async (amount: number) => {
     await transactionService.handleWalletOperation('withdraw', amount);
@@ -24,14 +36,14 @@ const WithdrawFundsButton: React.FC<WithdrawFundsButtonProps> = ({ fullWidth = f
       <FundActionButton
         action="withdraw"
         fullWidth={fullWidth}
-        onClick={() => setIsModalOpen(true)}
+        onClick={handleOpenModal}
       />
 
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         type="withdraw"
-        balance={user?.wallet?.balance || 0}
+        balance={currentBalance}
         onSubmit={handleTransaction}
       />
     </>

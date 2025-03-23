@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CoinData } from '../types/crypto';
 
 interface TransactionModalProps {
@@ -21,11 +21,21 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const [amount, setAmount] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [displayBalance, setDisplayBalance] = useState(balance);
 
+  useEffect(() => {
+    if (isOpen) {
+      setAmount('');
+      setError(null);
+      console.log('Modal opened with balance:', balance);
+      setDisplayBalance(balance);
+    }
+  }, [isOpen, type, balance]);
+  
   const isFiatOperation = type === 'deposit' || type === 'withdraw';
   const total = isFiatOperation ? Number(amount) : (cryptoData ? Number(amount) * cryptoData.rate : 0);
   const isValidAmount = Number(amount) > 0 && !isNaN(Number(amount));
-  const hasEnoughBalance = (type === 'sell' || type === 'withdraw') ? Number(amount) <= balance : true;
+  const hasEnoughBalance = (type === 'sell' || type === 'withdraw') ? Number(amount) <= displayBalance : true;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +59,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     // Allow only numbers and decimals
     if (/^\d*\.?\d*$/.test(value)) {
       setAmount(value);
+    }
+  };
+
+  const setMaxAmount = () => {
+    if (displayBalance) {
+      setAmount(displayBalance.toString());
     }
   };
 
@@ -121,6 +137,17 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               </div>
             )}
             <h2 className="text-2xl font-bold mt-2">{getTitle()}</h2>
+            
+            {isFiatOperation && (
+              <div className="mt-3 text-center bg-gray-50 rounded-lg px-4 py-3 w-full">
+                <div className="text-gray-600 text-sm font-medium">
+                  {type === 'withdraw' ? 'Available to Withdraw' : 'Current Balance'}
+                </div>
+                <div className="text-2xl font-bold text-primary-600">
+                  ${displayBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -148,7 +175,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                     <button
                       type="button"
                       className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded"
-                      onClick={() => setAmount(balance.toString())}
+                      onClick={setMaxAmount}
                     >
                       MAX
                     </button>
@@ -157,14 +184,27 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               </div>
 
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Available Balance</span>
-                  <span className="font-medium">
-                    {isFiatOperation 
-                      ? `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
-                      : `${balance.toLocaleString('en-US', { minimumFractionDigits: 8 })} ${cryptoData?.code}`}
-                  </span>
-                </div>
+                {!isFiatOperation && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Available Balance</span>
+                    <span className="font-medium">
+                      {`${displayBalance.toLocaleString('en-US', { minimumFractionDigits: 8 })} ${cryptoData?.code}`}
+                    </span>
+                  </div>
+                )}
+                
+                {isFiatOperation && type === 'withdraw' && (
+                  <div className="text-center text-sm text-gray-600">
+                    <p>Available to withdraw: ${displayBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                )}
+
+                {isFiatOperation && type === 'deposit' && (
+                  <div className="text-center text-sm text-gray-600">
+                    <p>Deposited funds will be immediately available in your account.</p>
+                  </div>
+                )}
+                
                 {!isFiatOperation && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Total {type === 'buy' ? 'Cost' : 'Received'}</span>
