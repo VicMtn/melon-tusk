@@ -124,6 +124,7 @@ const Markets: React.FC = () => {
       searchTerm={searchTerm}
       onSearch={setSearchTerm}
       emptyMessage="No cryptocurrencies found"
+      pageSize={0}
     />
   );
 };
