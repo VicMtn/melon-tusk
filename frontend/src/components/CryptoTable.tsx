@@ -150,7 +150,7 @@ export const CellRenderers = {
     <span className="text-nowrap">#{item.rank}</span>
   ),
   
-  nameWithImage: (item: CryptoData) => (
+  nameWithImage: (item: CoinData) => (
     <div className="flex items-center gap-3">
       {item.png64 && (
         <img 
@@ -166,7 +166,7 @@ export const CellRenderers = {
     </div>
   ),
   
-  price: (item: CryptoData) => (
+  price: (item: CoinData) => (
     <span>${item.rate?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
   ),
   
@@ -198,7 +198,7 @@ export const CellRenderers = {
   // Renderers pour l'historique des transactions
   transactionDate: (transaction: Transaction) => (
     <span className="text-gray-600">
-      {new Date(transaction.date).toLocaleDateString('en-US', {
+      {new Date(transaction.createdAt || '').toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
