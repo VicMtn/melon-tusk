@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import userService from '../services/userService';
 import { User, LoginCredentials, RegisterData } from '../types/user';
 import { useNavigate } from 'react-router-dom';
@@ -25,13 +25,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const clearError = () => setError(null);
 
-  const handleSessionExpired = () => {
+  const handleSessionExpired = useCallback(() => {
     setUser(null);
     setError('Votre session a expiré. Veuillez vous reconnecter.');
     localStorage.removeItem('userData');
     userService.logout();
     navigate('/');
-  };
+  }, [navigate]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     checkAuth();
-  }, [navigate]);
+  }, [navigate, handleSessionExpired]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
