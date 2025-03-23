@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import TransactionModal from './TransactionModal';
 import transactionService from '../services/transactionService';
-import { useUser } from '../hooks/useUser'; // Assurez-vous d'avoir ce hook pour gérer l'état de l'utilisateur
-import { CryptoData } from '../types/crypto';
+import { useUser } from '../hooks/useUser';
+import { CoinData } from '../types/crypto';
 
 interface BuyCryptoButtonProps {
-  cryptoData: Pick<CryptoData, 'code' | 'name' | 'rate' | 'png64'>;
+  cryptoData: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
   onSuccess?: () => void;
 }
 
@@ -13,7 +13,7 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({ cryptoData, onSuccess
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, refreshUser } = useUser();
 
-  const handleTransaction = async (amount: number, total: number) => {
+  const handleTransaction = async (amount: number) => {
     await transactionService.buyCrypto(cryptoData.code, amount);
     await refreshUser();
     onSuccess?.();
