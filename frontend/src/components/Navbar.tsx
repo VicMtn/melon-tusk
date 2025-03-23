@@ -57,7 +57,7 @@ const Navbar = () => {
         </li>
 
         <li>
-          <a className="dropdown-item" href="/faqs">
+          <a className="dropdown-item" href="/faq">
             <span className="icon-[tabler--help-triangle]"></span>
             FAQs
           </a>
