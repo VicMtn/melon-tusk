@@ -77,8 +77,16 @@ const Settings = () => {
         Settings
       </div>
       <div className="divider m-0 h-1"></div>
-      <div className="card bg-base-100 shadow">
-        <div className="card-body">
+      <div className="card bg-base-100 shadow relative">
+        <div className="absolute inset-0 bg-base-200/30 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div className="card bg-base-100 shadow-lg max-w-md mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-2">🚧 Work in Progress</h3>
+            <p className="text-base-content/80">
+              User settings functionality is currently under development. We are working on implementing secure profile updates, password changes, and avatar management. These features will be available soon!
+            </p>
+          </div>
+        </div>
+        <div className="card-body opacity-50">
           <h2 className="card-title mb-4">User Settings</h2>
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -185,7 +193,7 @@ const Settings = () => {
 
       <div className="card bg-base-100 shadow">
         <div className="card-body">
-          <h2 className="card-title mb-4">Theme Settings</h2>
+          <h2 className="card-title mb-4">Theme Settings (still in development)</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {themes.map((theme) => (
