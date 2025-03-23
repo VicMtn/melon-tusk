@@ -4,6 +4,7 @@ import Wallet from '../models/Wallet';
 import { Types } from 'mongoose';
 import { CreateTransactionInput, TransactionType } from '../interfaces/ITransaction';
 import { AuthRequest } from '../interfaces/IAuthRequest';
+import { fetchCoinData } from './marketController';
 
 // Validation helper
 const validateAmount = (amount: number, res: Response): boolean => {
@@ -77,8 +78,12 @@ export const withdraw = async (req: AuthRequest, res: Response) => {
 };
 
 export const buyCrypto = async (req: AuthRequest, res: Response) => {
-    const { code, amount, rate } = req.body;
+    const { code, amount } = req.body;
     const { id: userId, wallet: walletId } = req.user;
+
+    const coin = await fetchCoinData(code);
+    const rate = coin.rate;
+    const png64 = coin.png64;
 
     if (!validateAmount(amount, res) || !validateAmount(rate, res)) return;
     if (!code) {
@@ -109,6 +114,8 @@ export const buyCrypto = async (req: AuthRequest, res: Response) => {
             type: 'buy',
             code: code.toUpperCase(),
             amount,
+            png64: png64,
+            name: coin.name,
             rate,
             total: totalCost,
             currency: 'USD'
@@ -120,8 +127,12 @@ export const buyCrypto = async (req: AuthRequest, res: Response) => {
 };
 
 export const sellCrypto = async (req: AuthRequest, res: Response) => {
-    const { code, amount, rate } = req.body;
+    const { code, amount } = req.body;
     const { id: userId, wallet: walletId } = req.user;
+
+    const coin = await fetchCoinData(code);
+    const rate = coin.rate;
+    const png64 = coin.png64;
 
     if (!validateAmount(amount, res) || !validateAmount(rate, res)) return;
     if (!code) {
@@ -152,6 +163,8 @@ export const sellCrypto = async (req: AuthRequest, res: Response) => {
             type: 'sell',
             code: code.toUpperCase(),
             amount,
+            png64: png64,
+            name: coin.name,
             rate,
             total: amount * rate,
             currency: 'USD'

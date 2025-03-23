@@ -46,6 +46,16 @@ const transactionSchema = new Schema({
         type: String,
         uppercase: true,
         default: 'USD'
+    },
+    date: { 
+        type: Date, 
+        default: Date.now 
+    },
+    png64: {
+        type: String
+    },
+    name: {
+        type: String
     }
 }, {
     timestamps: true
@@ -79,7 +89,9 @@ transactionSchema.statics.logTransaction = async function(
         walletId: mongoose.Types.ObjectId;
         type: TransactionType;
         code?: string;
+        name?: string;
         amount: number;
+        png64?: string;
         rate?: number;
         total: number;
         currency?: string;

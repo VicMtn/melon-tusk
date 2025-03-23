@@ -13,6 +13,8 @@ export interface ITransaction extends Document {
   currency: string;
   createdAt: Date;
   updatedAt: Date;
+  png64?: string;
+  name?: string;
 }
 
 export interface CreateTransactionInput {
@@ -24,6 +26,8 @@ export interface CreateTransactionInput {
   rate?: number;
   total: number;
   currency: string;
+  png64?: string;
+  name?: string;
 }
 
 export interface TransactionModel extends Model<ITransaction> {
