@@ -1,6 +1,8 @@
 import logo from '../assets/images/logo.png';
+import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
+  const { user } = useAuth();
 
   return (
     <>
@@ -31,7 +33,7 @@ const Navbar = () => {
             </div>
           </div>
           <div>
-            <h6 className="text-base-content text-base font-semibold">Jean Charles</h6>
+            <h6 className="text-base-content text-base font-semibold">{user?.username}</h6>
           </div>
         </li>
         <li>
