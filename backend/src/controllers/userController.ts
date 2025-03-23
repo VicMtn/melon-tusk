@@ -30,10 +30,22 @@ export const register = async (req: Request, res: Response) => {
             wallet: tempWalletId
         });
 
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id }, 
+            process.env.JWT_SECRET!,
+            { expiresIn: envConfig.jwtExpiresIn }
+        );
+
+        // Return token and user information
         res.status(201).json({
-            _id: user._id,
-            username: user.username,
-            email: user.email
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                walletId: user.wallet.toString()
+            }
         });
     } catch (error: any) {
         if (error.message === 'Username or email already exists') {
@@ -61,7 +73,11 @@ export const login = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ id: user._id }, envConfig.jwtSecret, { expiresIn: envConfig.jwtExpiresIn });
+        const token = jwt.sign(
+            { id: user._id }, 
+            process.env.JWT_SECRET!,
+            { expiresIn: envConfig.jwtExpiresIn }
+        );
         
         // Return token and user information
         res.json({
@@ -70,7 +86,7 @@ export const login = async (req: Request, res: Response) => {
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                wallet: user.wallet
+                walletId: user.wallet.toString()
             }
         });
     } catch (error) {
