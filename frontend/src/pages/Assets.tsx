@@ -2,98 +2,51 @@ import { useState, useEffect } from 'react';
 import CryptoActionButton from '../components/CryptoActionButton';
 import FeaturedCoinCard from '../components/FeaturedCoinCard';
 import FundActionButton from '../components/FundActionButton';
-import CryptoTable, { TableColumn, CellRenderers, BaseCryptoData } from '../components/CryptoTable';
+import CryptoTable, { TableColumn } from '../components/CryptoTable';
 import TransactionModal from '../components/TransactionModal';
-
-interface CryptoData extends BaseCryptoData {
-  amount: number;
-  value: number;
-  delta: {
-    hour: number;
-    day: number;
-    week: number;
-    month: number;
-  };
-}
-
-interface WalletData {
-  totalBalance: number;
-  availableCash: number;
-  cryptoAssets: number;
-}
-
-interface CoinData {
-  name: string;
-  code: string;
-  png64: string;
-  rate: number;
-  rank: number;
-  delta: {
-    hour: number;
-    day: number;
-    week: number;
-    month: number;
-    quarter: number;
-    year: number;
-  };
-}
+import { CoinData } from '../types/crypto';
+import {IWallet, Asset} from '../types/wallet';
+import marketService from '../services/marketService';
+import walletService from '../services/walletService';
 
 const Assets = () => {
-  const [cryptoData, setCryptoData] = useState<CryptoData[]>([]);
-  const [walletData] = useState<WalletData>({
-    totalBalance: 64926.32,
-    availableCash: 10000.00,
-    cryptoAssets: 54926.32
+  const [topCoins, setTopCoins] = useState<CoinData[]>([]);
+  const [walletData, setWalletData] = useState<IWallet>({
+    id: '1',
+    balance: 0,
+    totalAssetsValue: 0,
+    assets: []
   });
 
   // Transaction modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
-  const [selectedCrypto, setSelectedCrypto] = useState<{
-    code: string;
-    name: string;
-    price: number;
-    icon?: string;
-  } | null>(null);
+  const [selectedCrypto, setSelectedCrypto] = useState<Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'> | null>(null);
 
   useEffect(() => {
-    fetch('/coindata.json')
-      .then(response => response.json())
-      .then(() => {
-        // Mock data for portfolio
-        const portfolioData: CryptoData[] = [
-          {
-            name: "Bitcoin",
-            code: "BTC",
-            rate: 96265.38,
-            amount: 0.50,
-            value: 48132.69,
-            png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/btc.png",
-            delta: {
-              hour: 0,
-              day: -0.08,
-              week: 1.12,
-              month: 0
-            }
-          },
-          {
-            name: "Ethereum",
-            code: "ETH",
-            rate: 2717.45,
-            amount: 2.50,
-            value: 6793.63,
-            png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/eth.png",
-            delta: {
-              hour: 0,
-              day: 0.45,
-              week: 4.37,
-              month: 0.28
-            }
-          }
-        ];
-        setCryptoData(portfolioData);
-      })
-      .catch(error => console.error('Error fetching data:', error));
+    const fetchData = async () => {
+      try {
+        // Récupérer les coins
+        const coinsResponse = await marketService.getAllMarket();
+        setTopCoins(coinsResponse.slice(0, 4));
+      } catch (error) {
+        console.error('Error fetching coins:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        const walletAssets = await walletService.getUserWallet();
+        setWalletData(walletAssets);
+      } catch (error) {
+        console.error('Error fetching wallet data:', error);
+      }
+    };
+    fetchWalletData();
   }, []);
 
   const formatNumber = (num: number): string => {
@@ -103,96 +56,32 @@ const Assets = () => {
     });
   };
 
-  // Mock data for featured coins
-  const featuredCoins: CoinData[] = [
-    {
-      name: "Bitcoin",
-      code: "BTC",
-      rate: 96265.38,
-      rank: 1,
-      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/btc.png",
-      delta: {
-        hour: 1.00,
-        day: 0.9992,
-        week: 1.0112,
-        month: 0.8946,
-        quarter: 0.9858,
-        year: 1.8222
-      }
-    },
-    {
-      name: "Ethereum",
-      code: "ETH",
-      rate: 2717.45,
-      rank: 2,
-      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/eth.png",
-      delta: {
-        hour: 1.0028,
-        day: 1.0045,
-        week: 1.0437,
-        month: 1.0028,
-        quarter: 1.0,
-        year: 1.0
-      }
-    },
-    {
-      name: "XRP",
-      code: "XRP",
-      rate: 2.61,
-      rank: 3,
-      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/xrp.png",
-      delta: {
-        hour: 1.0075,
-        day: 0.9986,
-        week: 1.0887,
-        month: 1.0,
-        quarter: 1.0,
-        year: 1.0
-      }
-    },
-    {
-      name: "Tether",
-      code: "USDT",
-      rate: 1.00,
-      rank: 4,
-      png64: "https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/usdt.png",
-      delta: {
-        hour: 0.9999,
-        day: 0.9988,
-        week: 0.9992,
-        month: 1.0,
-        quarter: 1.0,
-        year: 1.0
-      }
-    }
-  ];
-
-  const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: CryptoData) => {
+  const handleTransactionClick = (type: 'buy' | 'sell' | 'deposit' | 'withdraw', crypto?: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>) => {
     setModalType(type);
     if (crypto) {
-      setSelectedCrypto({
-        code: crypto.code || '',
-        name: crypto.name || '',
-        price: crypto.rate || 0,
-        icon: crypto.png64
-      });
+      setSelectedCrypto(crypto);
     } else {
       setSelectedCrypto(null);
     }
     setIsModalOpen(true);
   };
 
-  const handleTransactionSubmit = async (amount: number, total: number) => {
+  const handleTransactionSubmit = async () => {
     // TODO: Implement actual transaction logic
     // Mock success
     return Promise.resolve();
   };
 
-  const portfolioColumns: TableColumn<CryptoData>[] = [
+  const portfolioColumns: TableColumn<Asset>[] = [
     {
       key: 'asset',
       header: 'Asset',
-      render: CellRenderers.nameWithImage
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <img src={`https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${item.code.toLowerCase()}.png`} alt={item.code} className="w-8 h-8" />
+          <span>{item.code}</span>
+        </div>
+      )
     },
     {
       key: 'amount',
@@ -202,17 +91,21 @@ const Assets = () => {
     {
       key: 'price',
       header: 'Price',
-      render: CellRenderers.price
+      render: (item) => <span>${formatNumber(item.rate)}</span>
     },
     {
       key: 'value',
       header: 'Value',
-      render: (item) => <span>${formatNumber(item.value)}</span>
+      render: (item) => <span>${formatNumber(item.currentValue)}</span>
     },
     {
       key: 'change',
       header: '24h',
-      render: CellRenderers.percentChange
+      render: (item) => (
+        <span className={item.profitLossPercentage >= 0 ? 'text-green-500' : 'text-red-500'}>
+          {item.profitLossPercentage >= 0 ? '+' : ''}{formatNumber(item.profitLossPercentage)}%
+        </span>
+      )
     },
     {
       key: 'actions',
@@ -222,12 +115,22 @@ const Assets = () => {
           <CryptoActionButton
             action="buy"
             size="sm"
-            onClick={() => handleTransactionClick('buy', item)}
+            onClick={() => handleTransactionClick('buy', {
+              code: item.code,
+              name: item.code,
+              rate: item.rate,
+              png64: `https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${item.code.toLowerCase()}.png`
+            })}
           />
           <CryptoActionButton
             action="sell"
             size="sm"
-            onClick={() => handleTransactionClick('sell', item)}
+            onClick={() => handleTransactionClick('sell', {
+              code: item.code,
+              name: item.code,
+              rate: item.rate,
+              png64: `https://lcw.nyc3.cdn.digitaloceanspaces.com/production/currencies/64/${item.code.toLowerCase()}.png`
+            })}
           />
         </div>
       ),
@@ -242,7 +145,7 @@ const Assets = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
-          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalBalance)}</p>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue)}</p>
           <div className="flex justify-between text-sm">
             <div>
               <span className="text-gray-500">24h</span>
@@ -261,7 +164,7 @@ const Assets = () => {
 
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Available Cash</h3>
-          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.availableCash)}</p>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.balance)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
               <FundActionButton 
@@ -282,7 +185,7 @@ const Assets = () => {
 
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Crypto Assets</h3>
-          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.cryptoAssets)}</p>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue - walletData.balance)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
               <CryptoActionButton 
@@ -305,7 +208,7 @@ const Assets = () => {
       <div>
         <h2 className="text-m font-medium mb-4">Your Portfolio</h2>
         <CryptoTable
-          data={cryptoData}
+          data={walletData.assets}
           columns={portfolioColumns}
           emptyMessage="Your portfolio is empty. Start by buying some crypto!"
         />
@@ -313,20 +216,15 @@ const Assets = () => {
       <div>
         <h2 className="text-m font-medium mb-4">Featured Coins</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {featuredCoins.map((coin) => (
+          {topCoins.map((coin) => (
             <FeaturedCoinCard 
               key={coin.code} 
               coin={coin} 
               onBuy={() => handleTransactionClick('buy', {
-                ...coin,
-                amount: 0,
-                value: 0,
-                delta: {
-                  hour: coin.delta.hour - 1,
-                  day: coin.delta.day - 1,
-                  week: coin.delta.week - 1,
-                  month: coin.delta.month - 1
-                }
+                code: coin.code,
+                name: coin.name,
+                rate: coin.rate,
+                png64: coin.png64
               })}
             />
           ))}
@@ -338,9 +236,9 @@ const Assets = () => {
         onClose={() => setIsModalOpen(false)}
         type={modalType}
         cryptoData={selectedCrypto || undefined}
-        balance={modalType === 'withdraw' ? walletData.availableCash : 
-                modalType === 'sell' ? (cryptoData.find(c => c.code === selectedCrypto?.code)?.amount || 0) : 
-                walletData.availableCash}
+        balance={modalType === 'withdraw' ? walletData.balance : 
+                modalType === 'sell' ? (walletData.assets.find(a => a.code === selectedCrypto?.code)?.amount || 0) : 
+                walletData.balance}
         onSubmit={handleTransactionSubmit}
       />
     </div>
