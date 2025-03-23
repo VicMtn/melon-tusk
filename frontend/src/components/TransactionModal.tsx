@@ -35,11 +35,19 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const isFiatOperation = type === 'deposit' || type === 'withdraw';
   const total = isFiatOperation ? Number(amount) : (cryptoData ? Number(amount) * cryptoData.rate : 0);
   const isValidAmount = Number(amount) > 0 && !isNaN(Number(amount));
-  const hasEnoughBalance = (type === 'sell' || type === 'withdraw') ? Number(amount) <= displayBalance : true;
+  
+  const hasEnoughBalance = () => {
+    if (type === 'sell') {
+      return Number(amount) <= displayBalance;
+    } else if (type === 'withdraw') {
+      return Number(amount) <= displayBalance;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isValidAmount || !hasEnoughBalance || (!cryptoData && !isFiatOperation)) return;
+    if (!isValidAmount || !hasEnoughBalance() || (!cryptoData && !isFiatOperation)) return;
 
     setError(null);
     setIsLoading(true);
@@ -221,7 +229,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                   type === 'deposit' ? 'bg-blue-600 hover:bg-blue-700' :
                   'bg-red-500 hover:bg-red-600'
                 } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
-                disabled={isLoading || !isValidAmount || !hasEnoughBalance}
+                disabled={isLoading || !isValidAmount || !hasEnoughBalance()}
               >
                 {!isLoading && (
                   <span className={`icon-[tabler--${getIcon()}] size-5`}></span>
@@ -230,7 +238,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                   ? 'Processing...'
                   : !isValidAmount
                   ? 'Enter an amount'
-                  : !hasEnoughBalance
+                  : !hasEnoughBalance()
                   ? 'Insufficient balance'
                   : type === 'deposit'
                   ? 'Add Funds'
