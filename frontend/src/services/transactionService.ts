@@ -52,8 +52,8 @@ class TransactionService {
 
   async handleWalletOperation(type: 'deposit' | 'withdraw', amount: number): Promise<TransactionResponse> {
     try {
-      const response = await api.post<TransactionResponse>('/transactions/wallet', {
-        type,
+      const endpoint = `/transactions/${type}`;
+      const response = await api.post<TransactionResponse>(endpoint, {
         amount
       });
       return response.data;
