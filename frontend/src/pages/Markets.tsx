@@ -3,12 +3,16 @@ import CryptoTable, { TableColumn, CellRenderers } from '../components/CryptoTab
 import marketService from '../services/marketService';
 import { CoinData } from '../types/crypto';
 import { cleanCryptoCode } from '../utils/formatters';
+import BuyCryptoButton from '../components/BuyCryptoButton';
+import SellCryptoButton from '../components/SellCryptoButton';
+import { useUser } from '../hooks/useUser';
 
 const Markets: React.FC = () => {
   const [cryptoData, setCryptoData] = useState<CoinData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { refreshUser } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,6 +48,16 @@ const Markets: React.FC = () => {
     return cleanName.toLowerCase().includes(cleanSearchTerm.toLowerCase()) ||
            cleanCode.toLowerCase().includes(cleanSearchTerm.toLowerCase());
   });
+
+  const refreshData = async () => {
+    try {
+      const data = await marketService.getAllMarket();
+      setCryptoData(data);
+      await refreshUser();
+    } catch (err) {
+      console.error('Error refreshing data:', err);
+    }
+  };
 
   const columns: TableColumn<CoinData>[] = [
     {
@@ -81,7 +95,30 @@ const Markets: React.FC = () => {
     {
       key: 'actions',
       header: 'Actions',
-      render: CellRenderers.marketActions,
+      render: (item) => (
+        <div className="flex justify-center gap-2">
+          <BuyCryptoButton
+            cryptoData={{
+              code: item.code,
+              name: item.name,
+              rate: item.rate,
+              png64: item.png64
+            }}
+            size="sm"
+            onSuccess={refreshData}
+          />
+          <SellCryptoButton
+            cryptoData={{
+              code: item.code,
+              name: item.name,
+              rate: item.rate,
+              png64: item.png64
+            }}
+            size="sm"
+            onSuccess={refreshData}
+          />
+        </div>
+      ),
       className: 'text-center'
     }
   ];
