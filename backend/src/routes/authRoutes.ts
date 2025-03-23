@@ -8,5 +8,6 @@ const router = Router();
 router.post('/register', register);
 router.post('/login', login);
 router.post('/logout', authMiddleware, logout);
+router.get('/verify', authMiddleware, (req, res) => res.status(200).json({ valid: true }));
 
 export default router;

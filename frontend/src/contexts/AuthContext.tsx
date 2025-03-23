@@ -7,10 +7,12 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
+  error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,69 +20,122 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const clearError = () => setError(null);
+
+  const handleSessionExpired = () => {
+    setUser(null);
+    setError('Votre session a expiré. Veuillez vous reconnecter.');
+    localStorage.removeItem('userData');
+    userService.logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isAuth = userService.isAuthenticated();
-      
-      if (isAuth) {
-        const userDataStr = localStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          setUser(userData);
-          
-          if (window.location.pathname === '/') {
-            navigate('/homepage');
+      try {
+        const isAuth = userService.isAuthenticated();
+        
+        if (isAuth) {
+          const userDataStr = localStorage.getItem('userData');
+          if (userDataStr) {
+            const userData = JSON.parse(userDataStr);
+            
+            // Vérifier la validité du token avec le backend
+            try {
+              const response = await fetch('/api/auth/verify', {
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+              });
+              
+              if (!response.ok) {
+                handleSessionExpired();
+                return;
+              }
+              
+              setUser(userData);
+              if (window.location.pathname === '/') {
+                navigate('/homepage');
+              }
+            } catch (error) {
+              handleSessionExpired();
+            }
+          } else {
+            handleSessionExpired();
           }
         } else {
-          userService.logout();
-          setUser(null);
           if (window.location.pathname !== '/') {
             navigate('/');
           }
         }
-      } else {
-        if (window.location.pathname !== '/') {
-          navigate('/');
-        }
+      } catch (error) {
+        handleSessionExpired();
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkAuth();
   }, [navigate]);
 
   const login = async (credentials: LoginCredentials) => {
-    const userData = await userService.login(credentials);
-    setUser(userData);
-    navigate('/homepage');
+    try {
+      clearError();
+      const userData = await userService.login(credentials);
+      setUser(userData);
+      navigate('/homepage');
+    } catch (error) {
+      setError('Erreur lors de la connexion');
+      throw error;
+    }
   };
 
   const register = async (data: RegisterData) => {
-    const userData = await userService.register(data);
-    setUser(userData);
-    navigate('/homepage');
+    try {
+      clearError();
+      const userData = await userService.register(data);
+      setUser(userData);
+      navigate('/homepage');
+    } catch (error) {
+      setError('Erreur lors de l\'inscription');
+      throw error;
+    }
   };
 
   const logout = async () => {
-    await userService.logout();
-    setUser(null);
-    navigate('/');
+    try {
+      clearError();
+      await userService.logout();
+      setUser(null);
+      navigate('/');
+    } catch (error) {
+      setError('Erreur lors de la déconnexion');
+    }
   };
 
   const updatePassword = async (currentPassword: string, newPassword: string) => {
-    await userService.updatePassword(currentPassword, newPassword);
+    try {
+      clearError();
+      await userService.updatePassword(currentPassword, newPassword);
+    } catch (error) {
+      setError('Erreur lors de la mise à jour du mot de passe');
+      throw error;
+    }
   };
 
   const value = {
     user,
     isAuthenticated: !!user,
     loading,
+    error,
     login,
     register,
     logout,
     updatePassword,
+    clearError,
   };
 
   return (
