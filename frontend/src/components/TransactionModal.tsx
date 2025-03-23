@@ -59,9 +59,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       case 'sell':
         return 'arrow-up';
       case 'deposit':
-        return 'wallet';
+        return 'wallet-plus';
       case 'withdraw':
-        return 'wallet';
+        return 'wallet-minus';
+      default:
+        return 'arrow-down';
     }
   };
 

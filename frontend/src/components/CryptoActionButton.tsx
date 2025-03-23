@@ -22,27 +22,29 @@ const CryptoActionButton: React.FC<CryptoActionButtonProps> = ({
     ${isSquare ? 'btn-square' : ''}
   `;
 
+  const getIcon = () => {
+    switch (action) {
+      case 'buy':
+        return 'arrow-down';
+      case 'sell':
+        return 'arrow-up';
+      case 'watchlist':
+        return 'star';
+      default:
+        return 'arrow-down';
+    }
+  };
+
+  const iconSize = isSquare ? 'size-4' : 'size-5';
+  const iconMargin = isSquare ? '' : 'mr-2';
+
   return (
     <button 
       className={buttonClass}
       onClick={onClick}
     >
-      {action === 'buy' ? (
-        <>
-          <span className={`icon-[tabler--${isSquare ? 'square-arrow-down' : 'square-arrow-down'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
-          {!isSquare && 'Buy'}
-        </>
-      ) : action === 'sell' ? (
-        <>
-          <span className={`icon-[tabler--${isSquare ? 'square-arrow-up' : 'square-arrow-up'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
-          {!isSquare && 'Sell'}
-        </>
-      ) : (
-        <>
-          <span className={`icon-[tabler--${isSquare ? 'star' : 'star'}] ${isSquare ? 'size-4' : 'size-5 mr-2'}`}></span>
-          {!isSquare && 'Watchlist'}
-        </>
-      )}
+      <span className={`icon-[tabler--${getIcon()}] ${iconSize} ${iconMargin}`}></span>
+      {!isSquare && action.charAt(0).toUpperCase() + action.slice(1)}
     </button>
   );
 };

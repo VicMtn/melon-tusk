@@ -3,6 +3,7 @@ import TransactionModal from './TransactionModal';
 import transactionService from '../services/transactionService';
 import { useUser } from '../hooks/useUser';
 import { CoinData } from '../types/crypto';
+import CryptoActionButton from './CryptoActionButton';
 
 interface BuyCryptoButtonProps {
   cryptoData: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
@@ -21,13 +22,11 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({ cryptoData, onSuccess
 
   return (
     <>
-      <button
+      <CryptoActionButton
+        action="buy"
+        size="sm"
         onClick={() => setIsModalOpen(true)}
-        className="btn btn-success btn-sm"
-      >
-        <span className="icon-[tabler--arrow-down] size-4 mr-1"></span>
-        Buy
-      </button>
+      />
 
       <TransactionModal
         isOpen={isModalOpen}
