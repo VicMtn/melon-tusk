@@ -9,8 +9,24 @@ const lcwApi = createAxiosInstance({
   },
 });
 
+// Add throttling mechanism
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 2000; // 2 seconds minimum between requests
+
+const throttleRequest = async () => {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    await new Promise(resolve => setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest));
+  }
+  
+  lastRequestTime = Date.now();
+};
+
 export const getCoinsTop50List = async (): Promise<ICoin[]> => {
   try {
+    await throttleRequest();
     const response = await lcwApi.post("/coins/list", {
       currency: "USD",
       sort: "rank",
@@ -30,6 +46,7 @@ export const getCoinByCode = async (
   code: string
 ): Promise<ICoin> => {
   try {
+    await throttleRequest();
     const response = await lcwApi.post("/coins/single", {
       currency: "USD",
       code: code.toUpperCase(),
