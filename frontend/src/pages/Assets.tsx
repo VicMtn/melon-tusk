@@ -8,6 +8,7 @@ import { CoinData } from '../types/crypto';
 import {IWallet, Asset} from '../types/wallet';
 import marketService from '../services/marketService';
 import walletService from '../services/walletService';
+import transactionService from '../services/transactionService';
 
 const Assets = () => {
   const [topCoins, setTopCoins] = useState<CoinData[]>([]);
@@ -18,7 +19,6 @@ const Assets = () => {
     assets: []
   });
 
-  // Transaction modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'buy' | 'sell' | 'deposit' | 'withdraw'>('buy');
   const [selectedCrypto, setSelectedCrypto] = useState<Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'> | null>(null);
@@ -26,7 +26,6 @@ const Assets = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Récupérer les coins
         const coinsResponse = await marketService.getAllMarket();
         setTopCoins(coinsResponse.slice(0, 4));
       } catch (error) {
@@ -66,10 +65,22 @@ const Assets = () => {
     setIsModalOpen(true);
   };
 
-  const handleTransactionSubmit = async () => {
-    // TODO: Implement actual transaction logic
-    // Mock success
-    return Promise.resolve();
+  const handleTransactionSubmit = async (amount: number, total: number) => {
+    try {
+      if (modalType === 'deposit' || modalType === 'withdraw') {
+        await transactionService.handleWalletOperation(modalType, amount);
+      } else if (modalType === 'buy' && selectedCrypto) {
+        await transactionService.buyCrypto(selectedCrypto.code, amount);
+      } else if (modalType === 'sell' && selectedCrypto) {
+        await transactionService.sellCrypto(selectedCrypto.code, amount);
+      }
+      
+      const updatedWallet = await walletService.getUserWallet();
+      setWalletData(updatedWallet);
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      throw error;
+    }
   };
 
   const portfolioColumns: TableColumn<Asset>[] = [
@@ -100,7 +111,7 @@ const Assets = () => {
     },
     {
       key: 'change',
-      header: '24h',
+      header: '+/-',
       render: (item) => (
         <span className={item.profitLossPercentage >= 0 ? 'text-green-500' : 'text-red-500'}>
           {item.profitLossPercentage >= 0 ? '+' : ''}{formatNumber(item.profitLossPercentage)}%
@@ -145,20 +156,8 @@ const Assets = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
-          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue)}</p>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue + walletData.balance)}</p>
           <div className="flex justify-between text-sm">
-            <div>
-              <span className="text-gray-500">24h</span>
-              <span className="text-red-500 ml-1">-0.01%</span>
-            </div>
-            <div>
-              <span className="text-gray-500">7d</span>
-              <span className="text-green-500 ml-1">+1.52%</span>
-            </div>
-            <div>
-              <span className="text-gray-500">30d</span>
-              <span className="text-red-500 ml-1">-11.52%</span>
-            </div>
           </div>
         </div>
 
@@ -185,7 +184,7 @@ const Assets = () => {
 
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Crypto Assets</h3>
-          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue - walletData.balance)}</p>
+          <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue)}</p>
           <div className="flex gap-2">
             <div className="flex-1">
               <CryptoActionButton 
