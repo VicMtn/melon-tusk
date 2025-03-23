@@ -57,15 +57,9 @@ class TransactionService {
   /**
    * Récupérer l'historique des transactions
    */
-  async getHistory(params?: {
-    page?: number;
-    limit?: number;
-    startDate?: string;
-    endDate?: string;
-    type?: 'buy' | 'sell' | 'deposit' | 'withdraw';
-  }) {
+  async getHistory(): Promise<Transaction[]> {
     try {
-      const response = await api.get('/transactions/history', { params });
+      const response = await api.get('/transactions/history');
       return response.data;
     } catch (error: any) {
       if (error.response?.data?.error) {
