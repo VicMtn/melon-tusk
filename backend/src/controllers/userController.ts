@@ -20,7 +20,7 @@ export const register = async (req: Request, res: Response) => {
             return res.status(409).json({ error: 'Username or email already exists' });
         }
 
-        // Créer un wallet temporaire (à remplacer par votre logique de création de wallet)
+        // Create a temporary wallet (to be replaced with your wallet creation logic)
         const tempWalletId = new Types.ObjectId();
 
         const user = await User.createUser({
@@ -63,7 +63,7 @@ export const login = async (req: Request, res: Response) => {
 
         const token = jwt.sign({ id: user._id }, envConfig.jwtSecret, { expiresIn: '2h' });
         
-        // Renvoyer le token et les informations de l'utilisateur
+        // Return token and user information
         res.json({
             token,
             user: {

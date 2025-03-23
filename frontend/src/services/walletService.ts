@@ -5,7 +5,7 @@ import api from './api';
 
 
 /**
- * Service pour gérer les données du portefeuille de l'utilisateur
+ * Service to manage user's wallet data
  */
 class WalletService {
 
@@ -35,7 +35,7 @@ class WalletService {
   }
 
   /**
-   * Calcule la valeur totale du portefeuille et sa variation sur 24h
+   * Calculates the total portfolio value and its 24h variation
    */
   calculateWalletValue(wallet: IWallet, marketData: CoinData[]): { totalValue: number, change24h: number } {
     if (!wallet?.assets?.length || !marketData?.length) {
@@ -71,7 +71,7 @@ class WalletService {
   }
 
   /**
-   * Formate la valeur du portefeuille pour l'affichage
+   * Formate the portfolio value for display
    */
   formatWalletValue(value: number): string {
     return formatCurrency(value);

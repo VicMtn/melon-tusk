@@ -8,7 +8,7 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Routes protégées
+// Protected routes
 router.get('/username/:username', authMiddleware, getUserByUsername);
 router.get('/:id', authMiddleware, getUserById);
 router.patch('/:userId', authMiddleware, updateUser);

@@ -8,7 +8,7 @@ import envConfig from "../config/envConfig";
 // Configuration MongoDB
 const MONGODB_URI = envConfig.mongoUri;
 
-// Interfaces pour les données de test
+// Interfaces for test data
 interface TestAsset {
   code: string;
   amount: number;
@@ -33,7 +33,7 @@ interface TestUser {
   transactions: TestTransaction[];
 }
 
-// Données de test
+// Test data
 const users: TestUser[] = [
   {
     username: 'admin',

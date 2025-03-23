@@ -10,11 +10,11 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Routes de gestion des fonds
+// Fund management routes
 router.post('/deposit', authMiddleware, deposit as any);
 router.post('/withdraw', authMiddleware, withdraw as any);
 
-// Routes de trading
+// Trading routes
 router.post('/buy', authMiddleware, buyCrypto as any);
 router.post('/sell', authMiddleware, sellCrypto as any);
 

@@ -91,7 +91,7 @@ export const buyCrypto = async (req: AuthRequest, res: Response) => {
     }
 
     try {
-        // Vérifier le solde du wallet
+        // Check wallet balance
         const wallet = await Wallet.findById(walletId);
         if (!wallet) {
             return res.status(404).json({ error: 'Wallet not found' });
@@ -140,7 +140,7 @@ export const sellCrypto = async (req: AuthRequest, res: Response) => {
     }
 
     try {
-        // Vérifier la disponibilité des crypto-monnaies
+        // Check cryptocurrency availability
         const wallet = await Wallet.findById(walletId);
         if (!wallet) {
             return res.status(404).json({ error: 'Wallet not found' });

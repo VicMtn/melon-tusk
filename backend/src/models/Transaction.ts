@@ -61,10 +61,10 @@ const transactionSchema = new Schema({
     timestamps: true
 });
 
-// Index pour la recherche rapide par utilisateur
+// Index for quick user search
 transactionSchema.index({ userId: 1, createdAt: -1 });
 
-// Méthodes simples de lecture
+// Simple read methods
 transactionSchema.statics.findByUserId = async function(
     userId: string
 ): Promise<ITransaction[]> {
@@ -82,7 +82,7 @@ transactionSchema.statics.findByUserIdAndType = async function(
         .lean();
 };
 
-// Création simple d'une transaction
+// Simple transaction creation
 transactionSchema.statics.logTransaction = async function(
     data: {
         userId: mongoose.Types.ObjectId;

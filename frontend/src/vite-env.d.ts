@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-// Déclaration pour FlyonUI
+// Declaration for FlyonUI
 interface Window {
   HSStaticMethods: {
     autoInit: () => void;
