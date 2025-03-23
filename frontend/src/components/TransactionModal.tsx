@@ -107,103 +107,111 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`modal ${isOpen ? 'modal-open' : ''}`}>
-      <div className="modal-box max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 bg-black/50" onClick={onClose}></div>
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 z-50">
         <button
-          className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-full"
           onClick={onClose}
         >
           <span className="icon-[tabler--x] size-5"></span>
         </button>
-        <div className="flex flex-col items-center mb-6">
-          <span className={`icon-[tabler--${getIcon()}] size-16 ${getColor()}`}></span>
-          {!isFiatOperation && cryptoData && (
-            <div className="flex items-center mt-2">
-              {cryptoData.png64 && (
-                <img
-                  src={cryptoData.png64}
-                  alt={cryptoData.name}
-                  className="w-6 h-6 mr-2 rounded-full"
-                />
-              )}
-              <h3 className="text-lg font-bold">{cryptoData.name}</h3>
-            </div>
-          )}
-          <h2 className="text-2xl font-bold mt-2">{getTitle()}</h2>
-        </div>
+        <div className="p-6">
+          <div className="flex flex-col items-center mb-6">
+            <span className={`icon-[tabler--${getIcon()}] size-16 ${getColor()}`}></span>
+            {!isFiatOperation && cryptoData && (
+              <div className="flex items-center mt-2">
+                {cryptoData.png64 && (
+                  <img
+                    src={cryptoData.png64}
+                    alt={cryptoData.name}
+                    className="w-6 h-6 mr-2 rounded-full"
+                  />
+                )}
+                <h3 className="text-lg font-bold">{cryptoData.name}</h3>
+              </div>
+            )}
+            <h2 className="text-2xl font-bold mt-2">{getTitle()}</h2>
+          </div>
 
-        <form onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-error/10 text-error rounded-lg p-3 mb-4 text-sm">
-              {error}
-            </div>
-          )}
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 text-red-600 rounded-lg p-3 mb-4 text-sm">
+                {error}
+              </div>
+            )}
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount {isFiatOperation ? '(USD)' : `(${cryptoData?.code})`}
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={amount}
-                  onChange={(e) => handleAmountChange(e.target.value)}
-                  className="input input-bordered w-full pr-24"
-                  placeholder="0.00"
-                  required
-                />
-                {(type === 'sell' || type === 'withdraw') && (
-                  <button
-                    type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-xs"
-                    onClick={() => setAmount(balance.toString())}
-                  >
-                    MAX
-                  </button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount {isFiatOperation ? '(USD)' : `(${cryptoData?.code})`}
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={amount}
+                    onChange={(e) => handleAmountChange(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="0.00"
+                    required
+                  />
+                  {(type === 'sell' || type === 'withdraw') && (
+                    <button
+                      type="button"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-medium bg-gray-100 hover:bg-gray-200 rounded"
+                      onClick={() => setAmount(balance.toString())}
+                    >
+                      MAX
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Available Balance</span>
+                  <span className="font-medium">
+                    {isFiatOperation 
+                      ? `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
+                      : `${balance.toLocaleString('en-US', { minimumFractionDigits: 8 })} ${cryptoData?.code}`}
+                  </span>
+                </div>
+                {!isFiatOperation && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Total {type === 'buy' ? 'Cost' : 'Received'}</span>
+                    <span className="font-medium">${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  </div>
                 )}
               </div>
-            </div>
 
-            <div className="bg-base-200 rounded-lg p-4 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Available Balance</span>
-                <span className="font-medium">
-                  {isFiatOperation 
-                    ? `$${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}` 
-                    : `${balance.toLocaleString('en-US', { minimumFractionDigits: 8 })} ${cryptoData?.code}`}
-                </span>
-              </div>
-              {!isFiatOperation && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total {type === 'buy' ? 'Cost' : 'Received'}</span>
-                  <span className="font-medium">${total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )}
+              <button
+                type="submit"
+                className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
+                  type === 'buy' ? 'bg-green-600 hover:bg-green-700' :
+                  type === 'sell' ? 'bg-red-600 hover:bg-red-700' :
+                  type === 'deposit' ? 'bg-blue-500 hover:bg-blue-600' :
+                  'bg-red-400 hover:bg-red-500'
+                } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
+                disabled={isLoading || !isValidAmount || !hasEnoughBalance}
+              >
+                {!isLoading && (
+                  <span className={`icon-[tabler--${getIcon()}] size-5`}></span>
+                )}
+                {isLoading
+                  ? 'Processing...'
+                  : !isValidAmount
+                  ? 'Enter an amount'
+                  : !hasEnoughBalance
+                  ? 'Insufficient balance'
+                  : type === 'deposit'
+                  ? 'Add Funds'
+                  : type === 'withdraw'
+                  ? 'Withdraw Funds'
+                  : `${type === 'buy' ? 'Buy' : 'Sell'} ${cryptoData?.code}`}
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className={`btn w-full ${getButtonClass()} ${isLoading ? 'loading' : ''}`}
-              disabled={isLoading || !isValidAmount || !hasEnoughBalance}
-            >
-              {!isLoading && (
-                <span className={`icon-[tabler--${getIcon()}] size-5 mr-2`}></span>
-              )}
-              {isLoading
-                ? 'Processing...'
-                : !isValidAmount
-                ? 'Enter an amount'
-                : !hasEnoughBalance
-                ? 'Insufficient balance'
-                : type === 'deposit'
-                ? 'Add Funds'
-                : type === 'withdraw'
-                ? 'Withdraw Funds'
-                : `${type === 'buy' ? 'Buy' : 'Sell'} ${cryptoData?.code}`}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
