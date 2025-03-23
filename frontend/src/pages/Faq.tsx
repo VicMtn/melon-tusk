@@ -1,34 +1,34 @@
 const Faq = () => {
   const faqData = [
     {
-      question: "Qu'est-ce qu'un portefeuille factice ?",
+      question: "What is a mock wallet?",
       answer:
-        "Un portefeuille factice est une application ou un site qui imite le fonctionnement d'un portefeuille crypto sans être connecté à la blockchain. Ici, aucune vraie monnaie n'est échangée ou stockée ; tout est purement virtuel pour l'apprentissage ou la démonstration."
+        "A mock wallet is an application or website that simulates the functioning of a crypto wallet without being connected to the blockchain. Here, no real money is exchanged or stored; everything is purely virtual for learning or demonstration purposes."
     },
     {
-      question: "Pourquoi utiliser un portefeuille factice ?",
+      question: "Why use a mock wallet?",
       answer:
-        "Le but principal est de se familiariser avec l’interface et les fonctionnalités d’un portefeuille crypto sans prendre de risque financier. C’est idéal pour s’entraîner, apprendre les bases ou tester des stratégies de gestion de crypto-monnaies."
+        "The main purpose is to become familiar with the interface and features of a crypto wallet without taking any financial risk. It's ideal for practice, learning the basics, or testing cryptocurrency management strategies."
     },
     {
-      question: "Comment créer un compte sur ce portefeuille factice ?",
+      question: "How do I create an account on this mock wallet?",
       answer:
-        "Il vous suffit de créer un identifiant et un mot de passe. Aucune vérification d’identité ou de moyen de paiement n’est nécessaire, puisque tout est faux. Nous vous conseillons toutefois d’utiliser un mot de passe sûr si vous souhaitez protéger votre compte de démonstration."
+        "You simply need to create a username and password. No identity verification or payment method is required, since everything is simulated. We do recommend using a secure password if you wish to protect your demo account."
     },
     {
-      question: "Est-ce que je peux échanger de vraies crypto-monnaies dessus ?",
+      question: "Can I exchange real cryptocurrencies on it?",
       answer:
-        "Non, ce service ne supporte aucune transaction réelle. Les soldes et les transactions que vous voyez sont purement fictifs et n’ont aucune valeur sur le marché."
+        "No, this service does not support any real transactions. The balances and transactions you see are purely fictional and have no market value."
     },
     {
-      question: "Comment ajouter des fonds à mon portefeuille factice ?",
+      question: "How do I add funds to my mock wallet?",
       answer:
-        "Lorsque vous cliquez sur “Ajouter des fonds”, vous pouvez entrer n’importe quelle somme virtuelle pour mettre à jour votre solde. Cela n’affecte aucun compte bancaire ou carte de crédit ; tout reste dans le cadre de la simulation."
+        "When you click on 'Add Funds', you can enter any virtual amount to update your balance. This doesn't affect any bank account or credit card; everything remains within the simulation framework."
     },
     {
-      question: "Puis-je transférer mes fonds factices vers un autre portefeuille ?",
+      question: "Can I transfer my mock funds to another wallet?",
       answer:
-        "Non, cette fonctionnalité n’est pas disponible, car il n’y a pas d’intégration réelle avec la blockchain. Les transferts dans ce portefeuille restent internes et uniquement destinés à la simulation."
+        "No, this feature is not available as there is no real integration with the blockchain. Transfers in this wallet remain internal and are solely intended for simulation purposes."
     }
   ];
 
