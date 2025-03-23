@@ -1,4 +1,4 @@
-export interface IWallet extends Document {
+export interface IWallet {
     id: string;
     balance: number;
     totalAssetsValue: number;
