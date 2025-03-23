@@ -66,7 +66,7 @@ const config: Config = {
 
   // Authentification
   jwtSecret: requireEnv('JWT_SECRET'),
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '2h',
   
   // CORS
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173'
