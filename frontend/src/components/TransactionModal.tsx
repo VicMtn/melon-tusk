@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { CryptoData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: 'buy' | 'sell' | 'deposit' | 'withdraw';
-  cryptoData?: Pick<CryptoData, 'code' | 'name' | 'rate' | 'png64'>;
+  cryptoData?: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
   balance?: number;
   onSubmit: (amount: number, total: number) => Promise<void>;
 }
@@ -189,8 +189,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                 className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
                   type === 'buy' ? 'bg-green-600 hover:bg-green-700' :
                   type === 'sell' ? 'bg-red-600 hover:bg-red-700' :
-                  type === 'deposit' ? 'bg-blue-500 hover:bg-blue-600' :
-                  'bg-red-400 hover:bg-red-500'
+                  type === 'deposit' ? 'bg-blue-600 hover:bg-blue-700' :
+                  'bg-red-500 hover:bg-red-600'
                 } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2`}
                 disabled={isLoading || !isValidAmount || !hasEnoughBalance}
               >
