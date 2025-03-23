@@ -1,8 +1,16 @@
 import logo from '../assets/images/logo.png';
 import { useAuth } from '../contexts/AuthContext';
+import { useEffect } from 'react';
 
 const Navbar = () => {
   const { user } = useAuth();
+
+  useEffect(() => {
+    // Réinitialiser les composants FlyonUI
+    if (window.HSStaticMethods) {
+      window.HSStaticMethods.autoInit();
+    }
+  }, []);
 
   return (
     <>
