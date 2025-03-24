@@ -159,3 +159,11 @@ export const updateUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Error updating user' });
     }
 }; 
+
+export const getMe = async (req: Request, res: Response) => {
+    try {
+        res.status(200).json((req as any).user);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching user' });
+    }
+};
