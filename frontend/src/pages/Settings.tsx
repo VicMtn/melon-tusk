@@ -128,31 +128,6 @@ const Settings = () => {
           <h2 className="card-title mb-4">User Settings</h2>
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col items-center gap-4 mb-4">
-              <div 
-                className="avatar cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={handleAvatarClick}
-              >
-                <div className="w-24 h-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  <img src={userSettings.avatar} alt="User avatar" />
-                </div>
-              </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleAvatarChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <button 
-                type="button"
-                className="btn btn-sm btn-ghost"
-                onClick={handleAvatarClick}
-              >
-                Change Avatar
-              </button>
-            </div>
-
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Username</span>
