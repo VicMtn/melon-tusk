@@ -85,6 +85,13 @@ class UserService {
     localStorage.setItem('userData', JSON.stringify(authData.user));
     api.defaults.headers.common['Authorization'] = `Bearer ${authData.token}`;
   }
+
+  async getCurrentUser(): Promise<User | null> {
+    const route = "/user";
+    const response = await api.get<User>(route);
+    this.currentUser = response.data;
+    return this.currentUser;
+  }
 }
 
 export default new UserService(); 

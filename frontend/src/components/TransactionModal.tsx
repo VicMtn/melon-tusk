@@ -27,7 +27,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     if (isOpen) {
       setAmount('');
       setError(null);
-      console.log('Modal opened with balance:', balance);
       setDisplayBalance(balance);
     }
   }, [isOpen, type, balance]);
