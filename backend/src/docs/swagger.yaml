@@ -595,6 +595,173 @@ paths:
                     type: string
                     example: Error during logout
 
+  /auth/change-password:
+    post:
+      tags:
+        - Authentication
+      summary: Change user password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  format: password
+                  description: Current password
+                  example: "OldP@ssw0rd123"
+                newPassword:
+                  type: string
+                  format: password
+                  description: New password (min 8 characters, must contain letters and numbers)
+                  example: "NewP@ssw0rd456"
+      responses:
+        200:
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password changed successfully
+        400:
+          description: Invalid password format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Password must be at least 8 characters long and contain both letters and numbers
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid credentials
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User not found
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Error changing password
+
+  /auth/change-user:
+    post:
+      tags:
+        - Authentication
+      summary: Update username or email
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+              properties:
+                currentPassword:
+                  type: string
+                  format: password
+                  description: Current password to confirm identity
+                  example: "StrongP@ssw0rd123"
+                email:
+                  type: string
+                  format: email
+                  description: New email (optional)
+                  example: "new.email@example.com"
+                username:
+                  type: string
+                  description: New username (optional)
+                  example: "newUsername"
+      responses:
+        200:
+          description: User information updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 65a1b2c3d4e5f6a7b8c9d0e1
+                  username:
+                    type: string
+                    example: newUsername
+                  email:
+                    type: string
+                    example: new.email@example.com
+        400:
+          description: Invalid email format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid email format
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid credentials
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User not found
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Error updating user
+
   /wallet:
     get:
       tags:
