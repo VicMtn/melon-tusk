@@ -13,6 +13,7 @@ interface AuthContextType {
   logout: () => void;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   clearError: () => void;
+  refreshUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,6 +127,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const refreshUser = useCallback(() => {
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+      try {
+        const userData = JSON.parse(userDataStr);
+        setUser(userData);
+      } catch (error) {
+        console.error('Failed to parse user data from localStorage', error);
+      }
+    }
+  }, []);
+
   const value = {
     user,
     isAuthenticated: !!user,
@@ -136,6 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     updatePassword,
     clearError,
+    refreshUser,
   };
 
   return (
