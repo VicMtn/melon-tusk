@@ -103,6 +103,13 @@ const Settings = () => {
     }
 
     try {
+      if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
+        await userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
+        
+        refreshUser();
+        refreshAuthUser();
+      }
+
       if (userSettings.newPassword && userSettings.confirmPassword){
         if (userSettings.newPassword !== userSettings.confirmPassword){
           setNotification({
@@ -118,12 +125,7 @@ const Settings = () => {
         }
       }
 
-      if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
-        await userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
-        
-        refreshUser();
-        refreshAuthUser();
-      }
+
       
       setNotification({
         message: 'User settings updated successfully',
