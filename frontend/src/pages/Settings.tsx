@@ -1,5 +1,8 @@
 import { useTheme } from '../core/ThemeContext';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useUser } from '../hooks/useUser';
+import userService from '../services/userService';
+import Notification from '../components/Notification'; // Import the notification component
 
 interface UserSettings {
   username: string;
@@ -11,16 +14,34 @@ interface UserSettings {
 }
 
 const Settings = () => {
+  const { user } = useUser();
   const { theme: currentTheme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userSettings, setUserSettings] = useState<UserSettings>({
-    username: 'John Doe',
-    email: 'john@example.com',
+    username: '',
+    email: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe',
   });
+
+  // Update form values when user data changes
+  useEffect(() => {
+    if (user) {
+      setUserSettings(prev => ({
+        ...prev,
+        username: user.username || '',
+        email: user.email || '',
+      }));
+    }
+  }, [user]);
+
+  // Store current user values for comparison
+  const currentUsername = user?.username;
+  const currentEmail = user?.email;
+
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const themes = [
     'light',
@@ -63,12 +84,37 @@ const Settings = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (userSettings.newPassword !== userSettings.confirmPassword) {
-      alert("New passwords don't match!");
+    if (!userSettings.currentPassword){
+      setNotification({
+        message: 'Please enter your current password',
+        type: 'error'
+      });
       return;
     }
-    // TODO: Add API call to save user settings, feature might come later
-    console.log('Saving user settings:', userSettings);
+
+    if (userSettings.newPassword && userSettings.confirmPassword){
+      if (userSettings.newPassword !== userSettings.confirmPassword){
+        setNotification({
+          message: 'Passwords do not match',
+          type: 'error'
+        });
+        userSettings.newPassword = '';
+        userSettings.confirmPassword = '';
+        userSettings.currentPassword = '';
+        return;
+      }else{
+        userService.updatePassword(userSettings.currentPassword, userSettings.newPassword);
+      }
+    }
+
+    if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
+      userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
+    }
+    
+    setNotification({
+      message: 'User settings updated successfully',
+      type: 'success'
+    });
   };
 
   return (
@@ -78,15 +124,7 @@ const Settings = () => {
       </div>
       <div className="divider m-0 h-1"></div>
       <div className="card bg-base-100 shadow relative">
-        <div className="absolute inset-0 bg-base-200/30 backdrop-blur-sm z-10 flex items-center justify-center">
-          <div className="card bg-base-100 shadow-lg max-w-md mx-4 p-6">
-            <h3 className="text-lg font-semibold mb-2">🚧 Work in Progress</h3>
-            <p className="text-base-content/80">
-              User settings functionality is currently under development. We are working on implementing secure profile updates, password changes, and avatar management. These features will be available soon!
-            </p>
-          </div>
-        </div>
-        <div className="card-body opacity-50">
+        <div className="card-body">
           <h2 className="card-title mb-4">User Settings</h2>
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -145,19 +183,6 @@ const Settings = () => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Current Password</span>
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={userSettings.currentPassword}
-                onChange={handleUserSettingsChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control">
-              <label className="label">
                 <span className="label-text">New Password</span>
               </label>
               <input
@@ -181,12 +206,34 @@ const Settings = () => {
                 className="input input-bordered"
               />
             </div>
+            
+            <div className="divider">Current Password</div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Current Password</span>
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={userSettings.currentPassword}
+                onChange={handleUserSettingsChange}
+                className="input input-bordered"
+              />
+            </div>
 
             <div className="card-actions justify-end mt-4">
               <button type="submit" className="btn btn-primary">
                 Save Changes
               </button>
             </div>
+            {notification && (
+              <Notification
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification(null)}
+              />
+            )}
           </form>
         </div>
       </div>

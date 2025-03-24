@@ -64,10 +64,23 @@ class UserService {
       throw new Error('User not authenticated');
     }
 
-    await api.put('/users/me/password', {
+    await api.post('/auth/change-password', {
       currentPassword,
       newPassword
     });
+  }
+
+  async updateUserData(currentPassword: string, email: string, username: string): Promise<void> {
+    if (!this.isAuthenticated()) {
+      throw new Error('User not authenticated');
+    }
+
+    const response = await api.post<User>('/auth/change-user', {
+      email,
+      username,
+      currentPassword
+    });
+    this.currentUser = response.data;
   }
 
   isAuthenticated(): boolean {
