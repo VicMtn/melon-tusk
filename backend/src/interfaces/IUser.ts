@@ -16,6 +16,7 @@ export interface UserModel extends Model<IUser> {
     findByUsername(username: string): Promise<IUser | null>;
     findByEmail(email: string): Promise<IUser | null>;
     updateUserById(userId: string, updateData: Partial<CreateUserInput>): Promise<IUser | null>;
+    changePassword(userId: string, newPassword: string): Promise<IUser | null>;
 }
 
 export const userSchema = new Schema({

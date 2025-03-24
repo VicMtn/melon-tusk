@@ -29,6 +29,16 @@ userSchema.statics.createUser = async function(userData: CreateUserInput): Promi
     }
 };
 
+userSchema.statics.changePassword = async function(userId: string, newPassword: string): Promise<IUser | null> {
+    const user = await this.findById(userId);
+    if (!user) {
+        return null;
+    }
+    user.password = newPassword;
+    await user.save();
+    return user;
+}
+
 userSchema.statics.findByUsername = async function(username: string): Promise<IUser | null> {
     return this.findOne({ username }).populate('wallet');
 };
