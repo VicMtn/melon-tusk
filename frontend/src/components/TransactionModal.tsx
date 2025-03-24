@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CoinData } from '../types/crypto';
+import { Icon } from '@iconify/react';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -82,9 +83,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       case 'sell':
         return 'arrow-up';
       case 'deposit':
-        return 'wallet-plus';
+        return 'arrow-up';
       case 'withdraw':
-        return 'wallet-minus';
+        return 'arrow-down';
       default:
         return 'arrow-down';
     }
@@ -130,7 +131,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </button>
         <div className="p-6">
           <div className="flex flex-col items-center mb-6">
-            <span className={`icon-[tabler--${getIcon()}] size-16 ${getColor()}`}></span>
+            <Icon icon={`tabler:${getIcon()}`} className={`size-16 ${getColor()}`}></Icon>
             {!isFiatOperation && cryptoData && (
               <div className="flex items-center mt-2">
                 {cryptoData.png64 && (
@@ -231,7 +232,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                 disabled={isLoading || !isValidAmount || !hasEnoughBalance()}
               >
                 {!isLoading && (
-                  <span className={`icon-[tabler--${getIcon()}] size-5`}></span>
+                  <Icon icon={`tabler:${getIcon()}`} className={`size-5 white}`}></Icon>
                 )}
                 {isLoading
                   ? 'Processing...'
