@@ -23,7 +23,7 @@ Melon-Tusk is a comprehensive cryptocurrency management application with a React
 - **Portfolio Management**: Track your assets and their value
 - **Transactions**: Buy, sell, deposit, and withdraw funds
 - **Fear & Greed Index**: Market sentiment indicator
-- **Watchlist**: Follow your favorite cryptocurrencies
+- **Watchlist**: **STILL IN DEVELOPMENT** : Follow your favorites cryptocurrencies
 - **Market News**: Latest cryptocurrency news
 - **Secure Authentication**: User registration and login
 - **Account Settings**: Management of personal information and security
@@ -86,6 +86,13 @@ npm run install:all
 Start both servers using concurrently
 ```
 npm run dev
+```
+## Documentation
+
+### Swagger
+Once the server is running the docs is available at
+```
+/api/docs
 ```
 
 ## TechStack
