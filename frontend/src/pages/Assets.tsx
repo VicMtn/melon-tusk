@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
-import CryptoActionButton from '../components/CryptoActionButton';
 import FeaturedCoinCard from '../components/FeaturedCoinCard';
-import FundActionButton from '../components/FundActionButton';
 import CryptoTable, { TableColumn } from '../components/CryptoTable';
-import TransactionModal from '../components/TransactionModal';
 import { CoinData } from '../types/crypto';
 import {IWallet, Asset} from '../types/wallet';
 import marketService from '../services/marketService';
 import walletService from '../services/walletService';
-import transactionService from '../services/transactionService';
 import BuyCryptoButton from '../components/BuyCryptoButton';
 import SellCryptoButton from '../components/SellCryptoButton';
 import DepositFundsButton from '../components/DepositFundsButton';
 import WithdrawFundsButton from '../components/WithdrawFundsButton';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 const Assets = () => {
   const [topCoins, setTopCoins] = useState<CoinData[]>([]);
@@ -154,14 +151,7 @@ const Assets = () => {
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Total Balance</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue + walletData.balance)}</p>
-          <div className="flex justify-between text-sm">
-            {getMostValuableAsset() && (
-              <div className="text-gray-600">
-                Most valuable: <span className="font-medium text-primary-600">{getMostValuableAsset()?.code}</span>
-                <span className="ml-2">${formatNumber(getMostValuableAsset()?.value || 0)}</span>
-              </div>
-            )}
-          </div>
+          <p className="flex items-center gap-2"><Icon width={24} height={24} icon="tabler:info-circle" />Wallet + Assets</p>
         </div>
 
         <div className="card bg-white shadow-sm rounded-lg p-5">
@@ -180,27 +170,15 @@ const Assets = () => {
         <div className="card bg-white shadow-sm rounded-lg p-5">
           <h3 className="text-gray-500 text-lg font-medium mb-1">Crypto Assets</h3>
           <p className="text-2xl font-bold mb-3">${formatNumber(walletData.totalAssetsValue)}</p>
+          <div className="flex justify-between text-sm">
+            {getMostValuableAsset() && (
+              <div className="text-gray-500 mt-2 ">
+                Most valuable: <span className="text-primary-700 font-bold">{getMostValuableAsset()?.code}</span>
+                <span className="ml-2">${formatNumber(getMostValuableAsset()?.value || 0)}</span>
+              </div>
+            )}
+          </div>
           <div className="flex gap-2">
-            <div className="flex-1">
-              <CryptoActionButton 
-                action="buy"
-                fullWidth={true}
-                onClick={() => {
-                  // Redirect to Market page where they can select coins to buy
-                  window.location.href = '/market';
-                }}
-              />
-            </div>
-            <div className="flex-1">
-              <CryptoActionButton 
-                action="sell"
-                fullWidth={true}
-                onClick={() => {
-                  // If they have assets to sell, we can point them to the portfolio section
-                  document.getElementById('portfolio-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              />
-            </div>
           </div>
         </div>
       </div>
@@ -225,7 +203,6 @@ const Assets = () => {
               key={coin.code} 
               coin={coin} 
               onBuy={() => {
-                // Refresh wallet after purchase
                 refreshWallet();
               }}
             />
