@@ -225,15 +225,8 @@ const Assets = () => {
               key={coin.code} 
               coin={coin} 
               onBuy={() => {
-                const cryptoData = {
-                  code: coin.code,
-                  name: coin.name,
-                  rate: coin.rate,
-                  png64: coin.png64
-                };
-                
-                // We'll use BuyCryptoButton directly in FeaturedCoinCard instead
-                // This will be handled by passing the coin data to the FeaturedCoinCard
+                // Refresh wallet after purchase
+                refreshWallet();
               }}
             />
           ))}
