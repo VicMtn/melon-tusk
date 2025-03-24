@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useUser } from '../hooks/useUser';
 import userService from '../services/userService';
 import Notification from '../components/Notification'; // Import the notification component
+import { useAuth } from '../contexts/AuthContext';
 
 interface UserSettings {
   username: string;
@@ -14,7 +15,8 @@ interface UserSettings {
 }
 
 const Settings = () => {
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
+  const { refreshUser: refreshAuthUser } = useAuth();
   const { theme: currentTheme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userSettings, setUserSettings] = useState<UserSettings>({
@@ -42,6 +44,17 @@ const Settings = () => {
   const currentEmail = user?.email;
 
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Effet pour retirer la notification après 3 secondes
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const themes = [
     'light',
@@ -82,7 +95,7 @@ const Settings = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userSettings.currentPassword){
       setNotification({
@@ -92,29 +105,40 @@ const Settings = () => {
       return;
     }
 
-    if (userSettings.newPassword && userSettings.confirmPassword){
-      if (userSettings.newPassword !== userSettings.confirmPassword){
-        setNotification({
-          message: 'Passwords do not match',
-          type: 'error'
-        });
-        userSettings.newPassword = '';
-        userSettings.confirmPassword = '';
-        userSettings.currentPassword = '';
-        return;
-      }else{
-        userService.updatePassword(userSettings.currentPassword, userSettings.newPassword);
+    try {
+      if (userSettings.newPassword && userSettings.confirmPassword){
+        if (userSettings.newPassword !== userSettings.confirmPassword){
+          setNotification({
+            message: 'Passwords do not match',
+            type: 'error'
+          });
+          userSettings.newPassword = '';
+          userSettings.confirmPassword = '';
+          userSettings.currentPassword = '';
+          return;
+        } else {
+          await userService.updatePassword(userSettings.currentPassword, userSettings.newPassword);
+        }
       }
-    }
 
-    if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
-      userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
+      if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
+        await userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
+        
+        // Rafraîchir les données utilisateur dans tous les contextes
+        refreshUser();
+        refreshAuthUser();
+      }
+      
+      setNotification({
+        message: 'User settings updated successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      setNotification({
+        message: error instanceof Error ? error.message : 'An error occurred while updating settings',
+        type: 'error'
+      });
     }
-    
-    setNotification({
-      message: 'User settings updated successfully',
-      type: 'success'
-    });
   };
 
   return (
