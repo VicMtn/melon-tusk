@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '@iconify/react';
 
 interface CryptoActionButtonProps {
   action: 'buy' | 'sell' | 'watchlist';
@@ -43,7 +44,7 @@ const CryptoActionButton: React.FC<CryptoActionButtonProps> = ({
       className={buttonClass}
       onClick={onClick}
     >
-      <span className={`icon-[tabler--${getIcon()}] ${iconSize} ${iconMargin}`}></span>
+      <Icon icon={`tabler:${getIcon()}`} className={`${iconSize} ${iconMargin}`} />
       {!isSquare && action.charAt(0).toUpperCase() + action.slice(1)}
     </button>
   );
