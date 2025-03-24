@@ -81,6 +81,7 @@ class UserService {
       currentPassword
     });
     this.currentUser = response.data;
+    localStorage.setItem('userData', JSON.stringify(response.data));
   }
 
   isAuthenticated(): boolean {
