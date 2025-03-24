@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="Melon-Tusk Logo" width="200"/>
+  <img src="frontend/src/assets/images/logo.png" alt="Melon-Tusk Logo" width="300"/>
 </p>
 
 # Melon-Tusk
