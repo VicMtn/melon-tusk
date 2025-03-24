@@ -1,16 +1,20 @@
 import logo from '../assets/images/logo.png';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const [username, setUsername] = useState<string | undefined>(user?.username);
 
   useEffect(() => {
-    // Réinitialiser les composants FlyonUI
     if (window.HSStaticMethods) {
       window.HSStaticMethods.autoInit();
     }
   }, []);
+
+  useEffect(() => {
+    setUsername(user?.username);
+  }, [user]);
 
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,7 +50,7 @@ const Navbar = () => {
             </div>
           </div>
           <div>
-            <h6 className="text-base-content text-base font-semibold">{user?.username}</h6>
+            <h6 className="text-base-content text-base font-semibold">{username}</h6>
           </div>
         </li>
         <li>

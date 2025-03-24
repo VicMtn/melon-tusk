@@ -2,7 +2,7 @@ import { useTheme } from '../core/ThemeContext';
 import { useState, useRef, useEffect } from 'react';
 import { useUser } from '../hooks/useUser';
 import userService from '../services/userService';
-import Notification from '../components/Notification'; // Import the notification component
+import Notification from '../components/Notification';
 import { useAuth } from '../contexts/AuthContext';
 
 interface UserSettings {
@@ -28,7 +28,6 @@ const Settings = () => {
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe',
   });
 
-  // Update form values when user data changes
   useEffect(() => {
     if (user) {
       setUserSettings(prev => ({
@@ -39,13 +38,11 @@ const Settings = () => {
     }
   }, [user]);
 
-  // Store current user values for comparison
   const currentUsername = user?.username;
   const currentEmail = user?.email;
 
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Effet pour retirer la notification après 3 secondes
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -124,7 +121,6 @@ const Settings = () => {
       if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
         await userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
         
-        // Rafraîchir les données utilisateur dans tous les contextes
         refreshUser();
         refreshAuthUser();
       }
