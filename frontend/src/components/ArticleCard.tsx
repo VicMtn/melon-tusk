@@ -47,7 +47,8 @@ export function ArticleCard({ article }: ArticleCardProps) {
   return (
     <>
       <div 
-        className="card sm:card-side flex-1 bg-white hover:bg-base-100 transition-colors"
+        className="card sm:card-side flex-1 bg-white hover:bg-base-100 transition-colors hover:shadow-lg cursor-pointer"
+        onClick={() => window.open(article.URL, '_blank')}
       >
         <figure className="sm:w-48 sm:min-w-48 h-48 sm:h-full">
           <img
