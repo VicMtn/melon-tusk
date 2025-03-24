@@ -46,15 +46,25 @@ const transactionSchema = new Schema({
         type: String,
         uppercase: true,
         default: 'USD'
+    },
+    date: { 
+        type: Date, 
+        default: Date.now 
+    },
+    png64: {
+        type: String
+    },
+    name: {
+        type: String
     }
 }, {
     timestamps: true
 });
 
-// Index pour la recherche rapide par utilisateur
+// Index for quick user search
 transactionSchema.index({ userId: 1, createdAt: -1 });
 
-// Méthodes simples de lecture
+// Simple read methods
 transactionSchema.statics.findByUserId = async function(
     userId: string
 ): Promise<ITransaction[]> {
@@ -72,14 +82,16 @@ transactionSchema.statics.findByUserIdAndType = async function(
         .lean();
 };
 
-// Création simple d'une transaction
+// Simple transaction creation
 transactionSchema.statics.logTransaction = async function(
     data: {
         userId: mongoose.Types.ObjectId;
         walletId: mongoose.Types.ObjectId;
         type: TransactionType;
         code?: string;
+        name?: string;
         amount: number;
+        png64?: string;
         rate?: number;
         total: number;
         currency?: string;

@@ -18,9 +18,7 @@ export interface TransactionResponse {
 }
 
 class TransactionService {
-  /**
-   * Acheter une cryptomonnaie
-   */
+
   async buyCrypto(code: string, amount: number): Promise<TransactionResponse> {
     try {
       const response = await api.post<TransactionResponse>('/transactions/buy', {
@@ -36,13 +34,10 @@ class TransactionService {
     }
   }
 
-  /**
-   * Gérer les opérations sur le wallet (dépôt/retrait)
-   */
-  async handleWalletOperation(type: 'deposit' | 'withdraw', amount: number): Promise<TransactionResponse> {
+  async sellCrypto(code: string, amount: number): Promise<TransactionResponse> {
     try {
-      const response = await api.post<TransactionResponse>('/transactions/wallet', {
-        type,
+      const response = await api.post<TransactionResponse>('/transactions/sell', {
+        code,
         amount
       });
       return response.data;
@@ -54,18 +49,25 @@ class TransactionService {
     }
   }
 
-  /**
-   * Récupérer l'historique des transactions
-   */
-  async getHistory(params?: {
-    page?: number;
-    limit?: number;
-    startDate?: string;
-    endDate?: string;
-    type?: 'buy' | 'sell' | 'deposit' | 'withdraw';
-  }) {
+
+  async handleWalletOperation(type: 'deposit' | 'withdraw', amount: number): Promise<TransactionResponse> {
     try {
-      const response = await api.get('/transactions/history', { params });
+      const endpoint = `/transactions/${type}`;
+      const response = await api.post<TransactionResponse>(endpoint, {
+        amount
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      throw error;
+    }
+  }
+
+  async getHistory(): Promise<Transaction[]> {
+    try {
+      const response = await api.get('/transactions/history');
       return response.data;
     } catch (error: any) {
       if (error.response?.data?.error) {

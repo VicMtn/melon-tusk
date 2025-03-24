@@ -4,10 +4,10 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
-// Toutes les routes nécessitent une authentification
+// All routes require authentication
 router.use(authMiddleware);
 
-// Routes du wallet
+// Wallet routes
 router.get('/', getWalletBalance);
 router.get('/asset/:code', getAssetBalance);
 

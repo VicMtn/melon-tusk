@@ -4,16 +4,19 @@ import transactionService from '../services/transactionService';
 import { useUser } from '../hooks/useUser';
 import { CoinData } from '../types/crypto';
 import CryptoActionButton from './CryptoActionButton';
+import { Asset } from '../types/wallet';
 
-interface BuyCryptoButtonProps {
+interface SellCryptoButtonProps {
   cryptoData: Pick<CoinData, 'code' | 'name' | 'rate' | 'png64'>;
+  asset?: Asset;
   fullWidth?: boolean;
   size?: 'sm' | 'md' | 'lg';
   onSuccess?: () => void;
 }
 
-const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({ 
+const SellCryptoButton: React.FC<SellCryptoButtonProps> = ({ 
   cryptoData, 
+  asset, 
   fullWidth = false,
   size = 'sm',
   onSuccess 
@@ -21,8 +24,12 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, refreshUser } = useUser();
 
+  // Get the user's current amount of this cryptocurrency
+  const assetAmount = asset?.amount || 
+    user?.wallet?.assets?.find(a => a.code === cryptoData.code)?.amount || 0;
+
   const handleTransaction = async (amount: number) => {
-    await transactionService.buyCrypto(cryptoData.code, amount);
+    await transactionService.sellCrypto(cryptoData.code, amount);
     await refreshUser();
     if (onSuccess) onSuccess();
   };
@@ -30,7 +37,7 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({
   return (
     <>
       <CryptoActionButton
-        action="buy"
+        action="sell"
         size={size}
         fullWidth={fullWidth}
         onClick={() => setIsModalOpen(true)}
@@ -39,13 +46,13 @@ const BuyCryptoButton: React.FC<BuyCryptoButtonProps> = ({
       <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        type="buy"
+        type="sell"
         cryptoData={cryptoData}
-        balance={user?.wallet?.balance || 0}
+        balance={assetAmount}
         onSubmit={handleTransaction}
       />
     </>
   );
 };
 
-export default BuyCryptoButton; 
+export default SellCryptoButton; 

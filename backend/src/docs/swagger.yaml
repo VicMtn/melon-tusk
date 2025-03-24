@@ -37,30 +37,21 @@ components:
           type: string
           description: Associated wallet ID
           example: 65a1b2c3d4e5f6a7b8c9d0e2
-        createdAt:
-          type: string
-          format: date-time
-          example: "2024-02-23T00:30:40.464Z"
-      required:
-        - _id
-        - username
-        - email
-        - wallet
-        - createdAt
 
     Wallet:
       type: object
       properties:
-        _id:
+        id:
           type: string
           example: 65a1b2c3d4e5f6a7b8c9d0e2
-        userId:
-          type: string
-          example: 65a1b2c3d4e5f6a7b8c9d0e1
         balance:
           type: number
           description: Base currency balance (USD)
           example: 10000.00
+        totalAssetsValue:
+          type: number
+          description: Total value of all assets in USD
+          example: 48311.96
         assets:
           type: array
           items:
@@ -74,22 +65,33 @@ components:
                 type: number
                 description: Amount owned
                 example: 0.5
-              purchasePrice:
-                type: number
-                description: Average purchase price
-                example: 45000.00
               currentValue:
                 type: number
-                description: Current market value
+                description: Current market value in USD
                 example: 48311.96
+              rate:
+                type: number
+                description: Current exchange rate in USD
+                example: 96623.91
               profitLoss:
                 type: number
                 description: Profit/Loss in USD
                 example: 3311.96
+              profitLossPercentage:
+                type: number
+                description: Profit/Loss percentage
+                example: 7.35
+            required:
+              - code
+              - amount
+              - currentValue
+              - rate
+              - profitLoss
+              - profitLossPercentage
       required:
-        - _id
-        - userId
+        - id
         - balance
+        - totalAssetsValue
         - assets
 
     Transaction:
@@ -101,44 +103,72 @@ components:
         userId:
           type: string
           example: 65a1b2c3d4e5f6a7b8c9d0e1
+        walletId:
+          type: string
+          example: 65a1b2c3d4e5f6a7b8c9d0e2
         type:
           type: string
           enum: [buy, sell, deposit, withdraw]
           description: Transaction type
           example: buy
+        code:
+          type: string
+          description: Crypto currency code (required for buy/sell)
+          example: BTC
         amount:
           type: number
           description: Transaction amount
+          minimum: 0
           example: 0.5
-        code:
-          type: string
-          description: Crypto currency code (for buy/sell)
-          example: BTC
         rate:
           type: number
-          description: Exchange rate (for buy/sell)
+          description: Exchange rate (required for buy/sell)
+          minimum: 0
           example: 96623.91
         total:
           type: number
           description: Total amount in base currency
+          minimum: 0
           example: 48311.96
         currency:
           type: string
           description: Base currency of the transaction
+          default: USD
           example: USD
+        date:
+          type: string
+          format: date-time
+          description: Transaction date
+          example: "2024-02-23T00:30:40.464Z"
+        png64:
+          type: string
+          description: 64x64 PNG icon URL
+          example: "https://example.com/btc-64.png"
+        name:
+          type: string
+          description: Asset name
+          example: "Bitcoin"
         createdAt:
           type: string
           format: date-time
-          description: Creation date of the transaction
+          description: Creation timestamp
+          example: "2024-02-23T00:30:40.464Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
           example: "2024-02-23T00:30:40.464Z"
       required:
         - _id
         - userId
+        - walletId
         - type
         - amount
         - total
         - currency
+        - date
         - createdAt
+        - updatedAt
 
     CoinData:
       type: object
@@ -513,10 +543,6 @@ paths:
                     type: string
                     description: JWT token
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  expiresIn:
-                    type: integer
-                    example: 3600
-                    description: Token expiration time in seconds
                   user:
                     $ref: '#/components/schemas/User'
         401:
@@ -529,6 +555,45 @@ paths:
                   error:
                     type: string
                     example: Invalid email or password
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid or expired token
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Error during logout
 
   /wallet:
     get:
@@ -554,6 +619,64 @@ paths:
                   error:
                     type: string
                     example: Invalid or expired token
+
+  /wallet/asset/{code}:
+    get:
+      tags:
+        - Wallet
+      summary: Get balance of a specific asset
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+          description: Asset code (e.g., BTC for Bitcoin)
+          example: BTC
+      responses:
+        200:
+          description: Asset balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                    description: Amount of the asset owned
+                    example: 0.5
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid or expired token
+        404:
+          description: Wallet not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Wallet not found
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Error fetching asset balance
 
   /transactions/deposit:
     post:
@@ -667,7 +790,6 @@ paths:
               required:
                 - code
                 - amount
-                - rate
               properties:
                 code:
                   type: string
@@ -677,10 +799,6 @@ paths:
                   type: number
                   description: Amount to buy
                   example: 0.5
-                rate:
-                  type: number
-                  description: Exchange rate
-                  example: 96623.91
       responses:
         201:
           description: Purchase successful
@@ -725,7 +843,6 @@ paths:
               required:
                 - code
                 - amount
-                - rate
               properties:
                 code:
                   type: string
@@ -735,10 +852,6 @@ paths:
                   type: number
                   description: Amount to sell
                   example: 0.5
-                rate:
-                  type: number
-                  description: Exchange rate
-                  example: 96623.91
       responses:
         201:
           description: Sale successful
@@ -854,16 +967,16 @@ paths:
                     type: string
                     example: Invalid or expired token
 
-  /market/coins-top50:
+  /market/coins:
     get:
       tags:
         - Market Data
-      summary: Get top 50 cryptocurrencies by market cap
+      summary: Get top 50 cryptocurrencies by market cap and user's wallet coins
       security:
         - bearerAuth: []
       responses:
         200:
-          description: Top 50 coins retrieved successfully
+          description: Coins retrieved successfully
           content:
             application/json:
               schema:

@@ -2,6 +2,18 @@ import createAxiosInstance from "./index";
 import config from "../config/envConfig";
 import { ICoin } from "../interfaces/ICoin";
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+interface Cache {
+  [key: string]: CacheEntry<any>;
+}
+
+const CACHE_TTL = 300 * 1000; // 5 minute cache
+const cache: Cache = {};
+
 const lcwApi = createAxiosInstance({
   baseURL: "https://api.livecoinwatch.com",
   apiKeys: {
@@ -9,8 +21,51 @@ const lcwApi = createAxiosInstance({
   },
 });
 
+// Add throttling mechanism
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 5000; // 5 seconds minimum between requests
+
+const throttleRequest = async () => {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    await new Promise(resolve => setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest));
+  }
+  
+  lastRequestTime = Date.now();
+};
+
+const getCachedData = <T>(key: string): T | null => {
+  const entry = cache[key];
+  if (!entry) return null;
+
+  const now = Date.now();
+  if (now - entry.timestamp > CACHE_TTL) {
+    delete cache[key];
+    return null;
+  }
+
+  return entry.data;
+};
+
+const setCacheData = <T>(key: string, data: T): void => {
+  cache[key] = {
+    data,
+    timestamp: Date.now(),
+  };
+};
+
 export const getCoinsTop50List = async (): Promise<ICoin[]> => {
+  const cacheKey = 'top50List';
+  const cachedData = getCachedData<ICoin[]>(cacheKey);
+  
+  if (cachedData) {
+    return cachedData;
+  }
+
   try {
+    await throttleRequest();
     const response = await lcwApi.post("/coins/list", {
       currency: "USD",
       sort: "rank",
@@ -19,6 +74,8 @@ export const getCoinsTop50List = async (): Promise<ICoin[]> => {
       limit: 50,
       meta: true,
     });
+    
+    setCacheData(cacheKey, response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching coins list:", error);
@@ -29,7 +86,15 @@ export const getCoinsTop50List = async (): Promise<ICoin[]> => {
 export const getCoinByCode = async (
   code: string
 ): Promise<ICoin> => {
+  const cacheKey = `coin_${code.toLowerCase()}`;
+  const cachedData = getCachedData<ICoin>(cacheKey);
+  
+  if (cachedData) {
+    return cachedData;
+  }
+
   try {
+    await throttleRequest();
     const response = await lcwApi.post("/coins/single", {
       currency: "USD",
       code: code.toUpperCase(),
@@ -40,6 +105,7 @@ export const getCoinByCode = async (
       throw new Error("Coin not found");
     }
 
+    setCacheData(cacheKey, response.data);
     return response.data;
   } catch (error: any) {
     console.error(

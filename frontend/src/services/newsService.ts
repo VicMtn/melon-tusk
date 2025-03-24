@@ -1,28 +1,5 @@
 import api from './api.ts';
-
-export interface NewsArticle {
-  articleId: number;
-  title: string;
-  url: string;
-  imageUrl: string;
-  body: string;
-  publishedOn: string;
-  source: {
-    name: string;
-    url: string;
-    imageUrl: string;
-  };
-  sentiment: string;
-  categories: string[];
-}
-
-export interface NewsResponse {
-  data: NewsArticle[];
-  meta: {
-    count: number;
-    lastUpdate: string;
-  };
-}
+import { NewsArticle, NewsResponse } from '../types/articles.ts';
 
 class NewsService {
   async getLatestNews(): Promise<NewsResponse> {

@@ -3,17 +3,17 @@ import { IUser, userSchema, CreateUserInput, UserModel } from '../interfaces/IUs
 import { hashPassword, addAuthMethods } from '../middleware/authMiddleware';
 import Wallet from './Wallet';
 
-// Appliquer les middlewares
+// Apply middlewares
 hashPassword(userSchema);
 addAuthMethods(userSchema);
 
-// Méthodes statiques
+// Static methods
 userSchema.statics.createUser = async function(userData: CreateUserInput): Promise<IUser> {
     try {
-        // Créer un nouveau wallet
+        // Create a new wallet
         const wallet = await Wallet.createWallet();
         
-        // Créer l'utilisateur avec le wallet
+        // Create user with wallet
         const user = new this({
             ...userData,
             wallet: wallet._id
@@ -28,6 +28,16 @@ userSchema.statics.createUser = async function(userData: CreateUserInput): Promi
         throw error;
     }
 };
+
+userSchema.statics.changePassword = async function(userId: string, newPassword: string): Promise<IUser | null> {
+    const user = await this.findById(userId);
+    if (!user) {
+        return null;
+    }
+    user.password = newPassword;
+    await user.save();
+    return user;
+}
 
 userSchema.statics.findByUsername = async function(username: string): Promise<IUser | null> {
     return this.findOne({ username }).populate('wallet');
@@ -44,5 +54,5 @@ userSchema.statics.updateUserById = async function(
     return this.findByIdAndUpdate(userId, updateData, { new: true }).populate('wallet');
 };
 
-// Créer et exporter le modèle
+// Create and export model
 export default mongoose.model<IUser, UserModel>('User', userSchema);

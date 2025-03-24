@@ -1,6 +1,5 @@
 import api from './api';
-import { CryptoMiddleware } from '../middleware/cryptoMiddleware';
-import { MarketData } from '../types/crypto';
+import { CoinData } from '../types/crypto';
 
 interface NewsArticle {
   title: string;
@@ -12,27 +11,20 @@ interface NewsArticle {
 }
 
 export interface MarketResponse {
-  data: MarketData[];
+  data: CoinData[];
   meta: {
     lastUpdate: string;
     count: number;
   };
 }
 
-/**
- * Market Service for handling market data and news
- */
 class MarketService {
   constructor() {
   }
-
-  /**
-   * Get market data for all cryptocurrencies
-   */
-  async getAllMarket(): Promise<MarketData[]> {
+  async getAllMarket(): Promise<CoinData[]> {
     try {
-      const response = await api.get<MarketData[]>('/market/coins-top50');
-      return CryptoMiddleware.transformCoins(response.data);
+      const response = await api.get<CoinData[]>('/market/coins');
+      return response.data;
     } catch (error) {
       console.error('Error fetching market data:', error);
       return [];
@@ -45,5 +37,4 @@ class MarketService {
   }
 }
 
-// Export a singleton instance
 export default new MarketService();

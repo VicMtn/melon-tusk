@@ -6,7 +6,9 @@ export interface Transaction {
   rate?: number;
   total: number;
   currency: string;
-  date: string;
+  createdAt?: string;
+  png64?: string;
+  name?: string;
 }
 
 export interface TransactionResponse {

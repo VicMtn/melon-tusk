@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import userService, { User } from '../services/userService';
+import userService from '../services/userService';
+import { User } from '../types/user';
 
 export const useUser = () => {
   const [user, setUser] = useState<User | null>(null);

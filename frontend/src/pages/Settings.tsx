@@ -1,5 +1,9 @@
 import { useTheme } from '../core/ThemeContext';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useUser } from '../hooks/useUser';
+import userService from '../services/userService';
+import Notification from '../components/Notification';
+import { useAuth } from '../contexts/AuthContext';
 
 interface UserSettings {
   username: string;
@@ -11,16 +15,43 @@ interface UserSettings {
 }
 
 const Settings = () => {
+  const { user, refreshUser } = useUser();
+  const { refreshUser: refreshAuthUser } = useAuth();
   const { theme: currentTheme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userSettings, setUserSettings] = useState<UserSettings>({
-    username: 'John Doe',
-    email: 'john@example.com',
+    username: '',
+    email: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe', // Default
+    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John%20Doe',
   });
+
+  useEffect(() => {
+    if (user) {
+      setUserSettings(prev => ({
+        ...prev,
+        username: user.username || '',
+        email: user.email || '',
+      }));
+    }
+  }, [user]);
+
+  const currentUsername = user?.username;
+  const currentEmail = user?.email;
+
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const themes = [
     'light',
@@ -61,14 +92,49 @@ const Settings = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (userSettings.newPassword !== userSettings.confirmPassword) {
-      alert("New passwords don't match!");
+    if (!userSettings.currentPassword){
+      setNotification({
+        message: 'Please enter your current password',
+        type: 'error'
+      });
       return;
     }
-    // TODO: Add API call to save user settings
-    console.log('Saving user settings:', userSettings);
+
+    try {
+      if (userSettings.newPassword && userSettings.confirmPassword){
+        if (userSettings.newPassword !== userSettings.confirmPassword){
+          setNotification({
+            message: 'Passwords do not match',
+            type: 'error'
+          });
+          userSettings.newPassword = '';
+          userSettings.confirmPassword = '';
+          userSettings.currentPassword = '';
+          return;
+        } else {
+          await userService.updatePassword(userSettings.currentPassword, userSettings.newPassword);
+        }
+      }
+
+      if (userSettings.username !== currentUsername || userSettings.email !== currentEmail){
+        await userService.updateUserData(userSettings.currentPassword, userSettings.email, userSettings.username);
+        
+        refreshUser();
+        refreshAuthUser();
+      }
+      
+      setNotification({
+        message: 'User settings updated successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      setNotification({
+        message: error instanceof Error ? error.message : 'An error occurred while updating settings',
+        type: 'error'
+      });
+    }
   };
 
   return (
@@ -77,36 +143,11 @@ const Settings = () => {
         Settings
       </div>
       <div className="divider m-0 h-1"></div>
-      <div className="card bg-base-100 shadow">
+      <div className="card bg-base-100 shadow relative">
         <div className="card-body">
           <h2 className="card-title mb-4">User Settings</h2>
           
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col items-center gap-4 mb-4">
-              <div 
-                className="avatar cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={handleAvatarClick}
-              >
-                <div className="w-24 h-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                  <img src={userSettings.avatar} alt="User avatar" />
-                </div>
-              </div>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleAvatarChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <button 
-                type="button"
-                className="btn btn-sm btn-ghost"
-                onClick={handleAvatarClick}
-              >
-                Change Avatar
-              </button>
-            </div>
-
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Username</span>
@@ -137,19 +178,6 @@ const Settings = () => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Current Password</span>
-              </label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={userSettings.currentPassword}
-                onChange={handleUserSettingsChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control">
-              <label className="label">
                 <span className="label-text">New Password</span>
               </label>
               <input
@@ -173,19 +201,41 @@ const Settings = () => {
                 className="input input-bordered"
               />
             </div>
+            
+            <div className="divider">Current Password</div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Current Password</span>
+              </label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={userSettings.currentPassword}
+                onChange={handleUserSettingsChange}
+                className="input input-bordered"
+              />
+            </div>
 
             <div className="card-actions justify-end mt-4">
               <button type="submit" className="btn btn-primary">
                 Save Changes
               </button>
             </div>
+            {notification && (
+              <Notification
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification(null)}
+              />
+            )}
           </form>
         </div>
       </div>
 
       <div className="card bg-base-100 shadow">
         <div className="card-body">
-          <h2 className="card-title mb-4">Theme Settings</h2>
+          <h2 className="card-title mb-4">Theme Settings (still in development)</h2>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {themes.map((theme) => (

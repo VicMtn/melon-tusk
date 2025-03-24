@@ -8,7 +8,7 @@ import envConfig from "../config/envConfig";
 // Configuration MongoDB
 const MONGODB_URI = envConfig.mongoUri;
 
-// Interfaces pour les données de test
+// Interfaces for test data
 interface TestAsset {
   code: string;
   amount: number;
@@ -33,23 +33,179 @@ interface TestUser {
   transactions: TestTransaction[];
 }
 
-// Données de test
+// Test data
 const users: TestUser[] = [
   {
     username: 'admin',
     email: 'admin@example.com',
     password: 'cpnv1234',
-    initialBalance: 10000,
+    initialBalance: 18400,
     assets: [
-      { code: 'BTC', amount: 4.2 },
+      { code: 'BTC', amount: 2.2 },
       { code: 'ETH', amount: 18.0 },
-      { code: 'DOGE', amount: 14000 }
+      { code: 'DOGE', amount: 14000 },
+      { code: 'SOL', amount: 234 },
+      { code: 'XRP', amount: 151 },
+      { code: 'ADA', amount: 890 },
+      { code: 'DOT', amount: 34 },
+      { code: 'LINK', amount: 300 },
+      { code: 'UNI', amount: 9864 },
+      { code: 'BCH', amount: 88 },
+      { code: 'LTC', amount: 10000 },
+      { code: 'XLM', amount: 3 }
     ],
     transactions: [
-      { type: 'deposit', amount: 100000, total: 100000, currency: 'USD' },
-      { type: 'buy', code: 'BTC', amount: 4.2, rate: 40000, total: 168000 },
-      { type: 'buy', code: 'ETH', amount: 18.0, rate: 2500, total: 45000 },
-      { type: 'buy', code: 'DOGE', amount: 14000, rate: 0.1, total: 1400 }
+      { 
+        type: 'deposit', 
+        amount: 500000, 
+        total: 500000, 
+        currency: 'USD',
+        date: new Date('2024-03-01T10:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'BTC', 
+        amount: 3.0, 
+        rate: 42000, 
+        total: 126000,
+        date: new Date('2024-03-01T10:30:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'ETH', 
+        amount: 25.0, 
+        rate: 2800, 
+        total: 70000,
+        date: new Date('2024-03-01T11:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'DOGE', 
+        amount: 20000, 
+        rate: 0.15, 
+        total: 3000,
+        date: new Date('2024-03-01T11:30:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'BTC',
+        amount: 0.8,
+        rate: 45000,
+        total: 36000,
+        date: new Date('2024-03-02T14:30:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'ETH',
+        amount: 7.0,
+        rate: 3200,
+        total: 22400,
+        date: new Date('2024-03-02T15:00:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'DOGE',
+        amount: 6000,
+        rate: 0.18,
+        total: 1080,
+        date: new Date('2024-03-02T15:30:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'SOL', 
+        amount: 234, 
+        rate: 110, 
+        total: 25740,
+        date: new Date('2024-03-03T10:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'XRP', 
+        amount: 151, 
+        rate: 0.58, 
+        total: 87.58,
+        date: new Date('2024-03-03T10:30:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'ADA', 
+        amount: 1000, 
+        rate: 0.45, 
+        total: 450,
+        date: new Date('2024-03-03T11:00:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'ADA',
+        amount: 110,
+        rate: 0.42,
+        total: 46.2,
+        date: new Date('2024-03-03T16:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'DOT', 
+        amount: 34, 
+        rate: 7.2, 
+        total: 244.8,
+        date: new Date('2024-03-04T10:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'LINK', 
+        amount: 400, 
+        rate: 15.8, 
+        total: 6320,
+        date: new Date('2024-03-04T10:30:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'LINK',
+        amount: 100,
+        rate: 16.2,
+        total: 1620,
+        date: new Date('2024-03-04T14:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'UNI', 
+        amount: 9864, 
+        rate: 7.4, 
+        total: 72993.6,
+        date: new Date('2024-03-05T10:00:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'BCH', 
+        amount: 88, 
+        rate: 235, 
+        total: 20680,
+        date: new Date('2024-03-05T10:30:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'LTC', 
+        amount: 12000, 
+        rate: 20.5, 
+        total: 246000,
+        date: new Date('2024-03-05T11:00:00Z')
+      },
+      {
+        type: 'sell',
+        code: 'LTC',
+        amount: 2000,
+        rate: 22.8,
+        total: 45600,
+        date: new Date('2024-03-05T15:30:00Z')
+      },
+      { 
+        type: 'buy', 
+        code: 'XLM', 
+        amount: 3, 
+        rate: 0.11, 
+        total: 0.33,
+        date: new Date('2024-03-05T16:00:00Z')
+      }
     ]
   },
   {
@@ -121,8 +277,11 @@ async function seed() {
     for (const userData of users) {
       const { transactions, assets, initialBalance, ...userInput } = userData;
       
-      // Créer le wallet d'abord
-      const wallet = await Wallet.create({
+      // Créer l'utilisateur (cela créera automatiquement un wallet)
+      const user = await User.createUser(userInput);
+
+      // Mettre à jour le wallet avec les assets et le solde initial
+      await Wallet.findByIdAndUpdate(user.wallet, {
         balance: initialBalance,
         assets: assets.map(asset => ({
           code: asset.code,
@@ -130,18 +289,12 @@ async function seed() {
         }))
       });
 
-      // Créer l'utilisateur avec le wallet
-      const user = await User.createUser({
-        ...userInput,
-        wallet: wallet._id as Types.ObjectId
-      });
-
       // Créer les transactions
       await Transaction.insertMany(
         transactions.map(transaction => ({
           ...transaction,
           userId: user._id,
-          walletId: wallet._id
+          walletId: user.wallet
         }))
       );
 

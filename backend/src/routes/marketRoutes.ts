@@ -10,7 +10,7 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const router = Router();
 router.use(authMiddleware);
 
-// Routes du marché
+// Market routes
 router.get('/fear-and-greed', getMarketFearAndGreed);
 router.get('/coins', getAllCoins)
 router.get('/coins/:code', getACoin)

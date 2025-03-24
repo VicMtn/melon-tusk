@@ -43,7 +43,7 @@ export const walletSchema = new mongoose.Schema<IWallet>({
             default: 0,
             min: 0
         },
-        _id: false // Désactiver l'ID automatique pour les sous-documents
+        _id: false // Disable automatic ID for subdocuments
     }]
 }, {
     timestamps: true

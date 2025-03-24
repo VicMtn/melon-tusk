@@ -1,6 +1,25 @@
 import logo from '../assets/images/logo.png';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useState } from 'react';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const [username, setUsername] = useState<string | undefined>(user?.username);
+
+  useEffect(() => {
+    if (window.HSStaticMethods) {
+      window.HSStaticMethods.autoInit();
+    }
+  }, []);
+
+  useEffect(() => {
+    setUsername(user?.username);
+  }, [user]);
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    await logout();
+  };
 
   return (
     <>
@@ -20,7 +39,6 @@ const Navbar = () => {
               <div className="avatar">
                 <div className="w-10 rounded-full">
                 <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
-                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
                 </div>
               </div>
       </button>
@@ -29,11 +47,10 @@ const Navbar = () => {
           <div className="avatar">
             <div className="w-10 rounded-full">
             <div className="icon-[tabler--user-circle] bg-primary size-10"></div>
-                {/* <img src="https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png" alt="avatar" />  TODO: Add link to real image later */}
             </div>
           </div>
           <div>
-            <h6 className="text-base-content text-base font-semibold">Jean Charles</h6>
+            <h6 className="text-base-content text-base font-semibold">{username}</h6>
           </div>
         </li>
         <li>
@@ -44,16 +61,16 @@ const Navbar = () => {
         </li>
 
         <li>
-          <a className="dropdown-item" href="/faqs">
+          <a className="dropdown-item" href="/faq">
             <span className="icon-[tabler--help-triangle]"></span>
             FAQs
           </a>
         </li>
         <li className="dropdown-footer gap-2">
-          <a className="btn btn-error btn-soft btn-block" href="/logout">
+          <button className="btn btn-error btn-soft btn-block" onClick={handleLogout}>
             <span className="icon-[tabler--logout]"></span>
             Sign out
-          </a>
+          </button>
         </li>
       </ul>
     </div>

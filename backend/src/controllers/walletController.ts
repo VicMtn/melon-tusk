@@ -14,6 +14,7 @@ export const getWalletBalance = async (req: Request, res: Response) => {
             wallet.assets.map(async (asset: any) => {
                 const assetData = await fetchCoinData(asset.code);
                 const currentValue = assetData.rate * asset.amount;
+                const totalInvestment = getTotalInvestment(await getTransactionHistorybyCode(user, asset.code));
                 const profitLoss = currentValue - getTotalInvestment(await getTransactionHistorybyCode(user, asset.code));
                 return {
                     code: asset.code,
@@ -21,15 +22,15 @@ export const getWalletBalance = async (req: Request, res: Response) => {
                     currentValue: currentValue,
                     rate: assetData.rate,
                     profitLoss: profitLoss,
-                    profitLossPercentage: (profitLoss / getTotalInvestment(await getTransactionHistorybyCode(user, asset.code))) * 100
+                    profitLossPercentage: totalInvestment === 0 ? 0 : (profitLoss / totalInvestment) * 100
                 };
             })
         );
 
         res.json({
-            _id: wallet._id,
-            userId: user._id,
+            id: wallet._id,
             balance: wallet.balance,
+            totalAssetsValue: assets.reduce((total, asset) => total + asset.currentValue, 0),
             assets,
         });
     } catch (error) {
