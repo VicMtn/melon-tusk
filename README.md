@@ -8,10 +8,10 @@ Melon-Tusk is a comprehensive cryptocurrency management application with a React
 
 <p align="center">
   <a href="https://github.com/VicMtn">
-    <img src="https://github.com/VicMtn.png" width="50" style="border-radius:50%" alt="Victorien Montavon"/>
+    <img src="https://github.com/VicMtn.png" width="100" style="border-radius: 50%" alt="Victorien Montavon"/>
   </a>
   <a href="https://github.com/MinusW">
-    <img src="https://github.com/MinusW.png" width="50" style="border-radius:50%" alt="Shanshe Gundishvili"/>
+    <img src="https://github.com/MinusW.png" width="100" style="border-radius: 50%" alt="Shanshe Gundishvili"/>
   </a>
 </p>
 
